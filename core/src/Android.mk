@@ -9,7 +9,7 @@ LOCAL_SRC_FILES := \
         intel_m4v_config_parser.cpp
 
 LOCAL_MODULE := libwrs_omxil_core_pvwrapped
-LOCAL_MODULE_TAGS := optional
+LOCAL_MODULE_TAGS := eng
 
 LOCAL_CPPFLAGS :=
 
