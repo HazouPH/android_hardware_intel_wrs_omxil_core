@@ -9,7 +9,8 @@ PRODUCT_COPY_FILES += \
 	$(LOCAL_PATH)/10_wrs_omxil_core.cfg:system/etc/10_wrs_omxil_core.cfg
 #$(call add-prebuilt-files, ETC, 10_wrs_omxil_core.cfg)
 
-COMPONENT_USE_BUFFERSHARING := false
+COMPONENT_SUPPORT_BUFFER_SHARING := false
+COMPONENT_SUPPORT_OPENCORE := false
 
 # core
 -include $(WRS_OMXIL_CORE_ROOT)/core/src/Android.mk
