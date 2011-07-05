@@ -125,6 +125,26 @@ typedef struct OMX_VIDEO_CONFIG_INTEL_AIR {
 
 } OMX_VIDEO_CONFIG_INTEL_AIR;
 
+typedef struct OMX_VIDEO_PARAM_INTEL_AVCVUI {
+     OMX_U32 nSize;                       // Size of the structure
+     OMX_VERSIONTYPE nVersion;            // OMX specification version
+     OMX_U32 nPortIndex;                  // Port that this structure applies to
+     OMX_BOOL  bVuiGeneration;            // Enable/disable VUI generation
+
+} OMX_VIDEO_PARAM_INTEL_AVCVUI;
+
+typedef struct OMX_VIDEO_PARAM_INTEL_ADAPTIVE_SLICE_CONTROL {
+     OMX_U32 nSize;                       // Size of the structure
+     OMX_VERSIONTYPE nVersion;            // OMX specification version
+     OMX_U32 nPortIndex;                  // Port that this structure applies to
+     OMX_BOOL bEnable;                    // enable adaptive slice control
+     OMX_U32 nMinPSliceNumber;            // minimum number of P slices
+     OMX_U32 nNumPFramesToSkip;           // number of P frames after an I frame to skip before kicking in adaptive slice control
+     OMX_U32 nSliceSizeThreshold;         // Slice size threshold for adaptive slice control to start a new slice
+     OMX_U32 nSliceSizeSkipThreshold;     // Slice size skip threshold for adaptive slice control to start a new slice
+} OMX_VIDEO_PARAM_INTEL_ADAPTIVE_SLICE_CONTROL;
+
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

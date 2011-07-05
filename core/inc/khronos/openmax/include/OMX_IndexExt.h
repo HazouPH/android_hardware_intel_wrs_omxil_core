@@ -71,7 +71,9 @@ typedef enum OMX_INDEXEXTTYPE {
     OMX_IndexConfigIntelBitrate,                    /**< reference: OMX_VIDEO_CONFIG_INTEL_BITRATETYPE */
     OMX_IndexParamIntelAVCDecodeSettings,           /**< reference: OMX_VIDEO_PARAM_INTEL_AVC_DECODE_SETTINGS */
     OMX_IndexConfigIntelSliceNumbers,               /**< reference: OMX_VIDEO_CONFIG_INTEL_SLICE_NUMBERS */
-    OMX_IndexConfigIntelAIR,                         /**< reference: OMX_VIDEO_CONFIG_INTEL_AIR */
+    OMX_IndexConfigIntelAIR,                        /**< reference: OMX_VIDEO_CONFIG_INTEL_AIR */
+    OMX_IndexParamIntelAVCVUI,                      /**< reference: OMX_VIDEO_PARAM_INTEL_AVCVUI */
+    OMX_IndexParamIntelAdaptiveSliceControl,        /**< reference: OMX_VIDEO_PARAM_INTEL_ADAPTIVE_SLICE_CONTROL */
 
     /* Image & Video common configurations */
     OMX_IndexExtCommonStartUnused = OMX_IndexKhronosExtensions + 0x00700000,
