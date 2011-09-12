@@ -1,6 +1,14 @@
 ifeq ($(strip $(BOARD_USES_WRS_OMXIL_CORE)),true)
 
 LOCAL_PATH := $(call my-dir)
+
+include $(CLEAR_VARS)
+LOCAL_COPY_HEADERS := \
+    core/inc/khronos/openmax/include/OMX_IndexExt.h \
+    core/inc/khronos/openmax/include/OMX_VideoExt.h \
+
+include $(BUILD_COPY_HEADERS)
+
 include $(CLEAR_VARS)
 
 WRS_OMXIL_CORE_ROOT := $(LOCAL_PATH)
