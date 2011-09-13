@@ -157,6 +157,8 @@ OMX_API OMX_ERRORTYPE OMX_APIENTRY OMX_Deinit(void)
         ret = OMX_ErrorUndefined;
     pthread_mutex_unlock(&g_module_lock);
 
+    g_initialized = 0;
+
     LOGV("%s(): exit done (ret : 0x%08x)", __FUNCTION__, ret);
     return ret;
 }
