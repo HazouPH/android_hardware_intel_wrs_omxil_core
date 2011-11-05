@@ -49,6 +49,7 @@ typedef enum OMX_NALUFORMATSTYPE {
     OMX_NaluFormatFourByteInterleaveLength = 16,
     OMX_NaluFormatZeroByteInterleaveLength = 32,
     OMX_NaluFormatStartCodesSeparateFirstHeader = 64,
+    OMX_NaluFormatLengthPrefixedSeparateFirstHeader = 128,
     OMX_NaluFormatCodingMax = 0x7FFFFFFF
 } OMX_NALUFORMATSTYPE;
 
