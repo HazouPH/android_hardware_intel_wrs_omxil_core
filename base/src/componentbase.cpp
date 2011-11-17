@@ -23,6 +23,7 @@
 
 #include <OMX_Core.h>
 #include <OMX_Component.h>
+#include <OMX_IndexExt.h>
 
 #include <componentbase.h>
 
@@ -747,11 +748,16 @@ OMX_ERRORTYPE ComponentBase::CBaseGetExtensionIndex(
     OMX_IN  OMX_STRING cParameterName,
     OMX_OUT OMX_INDEXTYPE* pIndexType)
 {
-    /*
-     * Todo
-     */
+    if (hComponent != handle) {
+        return OMX_ErrorBadParameter;
+    };
 
-    return OMX_ErrorNotImplemented;
+    if (!strcmp(cParameterName, "OMX.Intel.Index.BufferIDMode")) {
+        *pIndexType = static_cast<OMX_INDEXTYPE>(OMX_IndexBufferIDMode);
+        return OMX_ErrorNone;
+    }
+
+    return OMX_ErrorUnsupportedIndex;
 }
 
 OMX_ERRORTYPE ComponentBase::GetState(

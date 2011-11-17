@@ -74,6 +74,7 @@ typedef enum OMX_INDEXEXTTYPE {
     OMX_IndexConfigIntelAIR,                        /**< reference: OMX_VIDEO_CONFIG_INTEL_AIR */
     OMX_IndexParamIntelAVCVUI,                      /**< reference: OMX_VIDEO_PARAM_INTEL_AVCVUI */
     OMX_IndexParamIntelAdaptiveSliceControl,        /**< reference: OMX_VIDEO_PARAM_INTEL_ADAPTIVE_SLICE_CONTROL */
+    OMX_IndexBufferIDMode,                          /**< reference: boolean value to specify buffer id mode is in effect*/
 
     /* Image & Video common configurations */
     OMX_IndexExtCommonStartUnused = OMX_IndexKhronosExtensions + 0x00700000,
