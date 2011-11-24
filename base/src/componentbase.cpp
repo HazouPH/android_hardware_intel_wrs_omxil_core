@@ -757,6 +757,11 @@ OMX_ERRORTYPE ComponentBase::CBaseGetExtensionIndex(
         return OMX_ErrorNone;
     }
 
+    if (!strcmp(cParameterName, "OMX.google.android.index.storeMetaDataInBuffers")) {
+        *pIndexType = static_cast<OMX_INDEXTYPE>(OMX_IndexStoreMetaDataInBuffers);
+        return OMX_ErrorNone;
+    }
+
     return OMX_ErrorUnsupportedIndex;
 }
 
