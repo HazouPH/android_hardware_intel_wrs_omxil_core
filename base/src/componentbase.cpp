@@ -23,12 +23,12 @@
 
 #include <OMX_Core.h>
 #include <OMX_Component.h>
-#include <OMX_IndexExt.h>
 
 #include <componentbase.h>
 
 #include <queue.h>
 #include <workqueue.h>
+#include <OMX_IndexExt.h>
 
 //#define LOG_NDEBUG 0
 
@@ -136,6 +136,7 @@ void ComponentBase::__ComponentBase(void)
     bufferwork = NULL;
 
     pthread_mutex_init(&ports_block, NULL);
+    pthread_mutex_init(&output_queue_lock, NULL);
 }
 
 ComponentBase::ComponentBase()
@@ -152,6 +153,7 @@ ComponentBase::ComponentBase(const OMX_STRING name)
 ComponentBase::~ComponentBase()
 {
     pthread_mutex_destroy(&ports_block);
+    pthread_mutex_destroy(&output_queue_lock);
 
     if (roles) {
         if (roles[0])
@@ -543,6 +545,7 @@ OMX_ERRORTYPE ComponentBase::CBaseGetParameter(
 
         ret = OMX_ErrorUnsupportedIndex;
         break;
+
     default:
         ret = ComponentGetParameter(nParamIndex, pComponentParameterStructure);
     } /* switch */
@@ -643,6 +646,7 @@ OMX_ERRORTYPE ComponentBase::CBaseSetParameter(
         }
         break;
     }
+
     default:
         ret = ComponentSetParameter(nIndex, pComponentParameterStructure);
     } /* switch */
@@ -748,17 +752,31 @@ OMX_ERRORTYPE ComponentBase::CBaseGetExtensionIndex(
     OMX_IN  OMX_STRING cParameterName,
     OMX_OUT OMX_INDEXTYPE* pIndexType)
 {
+    /*
+     * Todo
+     */
     if (hComponent != handle) {
-        return OMX_ErrorBadParameter;
-    };
 
-    if (!strcmp(cParameterName, "OMX.Intel.Index.BufferIDMode")) {
-        *pIndexType = static_cast<OMX_INDEXTYPE>(OMX_IndexBufferIDMode);
-        return OMX_ErrorNone;
+        return OMX_ErrorBadParameter;
     }
 
     if (!strcmp(cParameterName, "OMX.google.android.index.storeMetaDataInBuffers")) {
         *pIndexType = static_cast<OMX_INDEXTYPE>(OMX_IndexStoreMetaDataInBuffers);
+        return OMX_ErrorNone;
+    }
+
+    if(!strcmp(cParameterName, "OMX.google.android.index.enableAndroidNativeBuffers")) {
+        *pIndexType = static_cast<OMX_INDEXTYPE>(OMX_IndexExtEnableNativeBuffer);
+        return OMX_ErrorNone;
+    }
+
+    if(!strcmp(cParameterName, "OMX.google.android.index.getAndroidNativeBufferUsage")) {
+        *pIndexType = static_cast<OMX_INDEXTYPE>(OMX_IndexExtGetNativeBufferUsage);
+        return OMX_ErrorNone;
+    }
+
+    if(!strcmp(cParameterName, "OMX.google.android.index.useAndroidNativeBuffer")) {
+        *pIndexType = static_cast<OMX_INDEXTYPE>(OMX_IndexExtUseNativeBuffer);
         return OMX_ErrorNone;
     }
 
@@ -1105,7 +1123,13 @@ OMX_ERRORTYPE ComponentBase::CBaseFillThisBuffer(
             return OMX_ErrorIncorrectStateOperation;
     }
 
+    ret = PreProcessBuffer(pBuffer);
+    if (ret != OMX_ErrorNone)
+       return ret;
+
+    pthread_mutex_lock(&output_queue_lock);
     ret = port->PushThisBuffer(pBuffer);
+    pthread_mutex_unlock(&output_queue_lock);
     if (ret == OMX_ErrorNone)
         bufferwork->ScheduleWork(this);
 
@@ -1866,7 +1890,8 @@ OMX_ERRORTYPE ComponentBase::FreePorts(void)
 /* implement WorkableInterface */
 void ComponentBase::Work(void)
 {
-    OMX_BUFFERHEADERTYPE *buffers[nr_ports];
+    OMX_BUFFERHEADERTYPE **buffers[nr_ports];
+    OMX_BUFFERHEADERTYPE *buffers_hdr[nr_ports];
     buffer_retain_t retain[nr_ports];
     OMX_U32 i;
     OMX_ERRORTYPE ret;
@@ -1876,22 +1901,28 @@ void ComponentBase::Work(void)
     while(IsAllBufferAvailable())
     {
         for (i = 0; i < nr_ports; i++) {
-            buffers[i] = ports[i]->PopBuffer();
+            buffers_hdr[i] = ports[i]->PopBuffer();
+            buffers[i] = &buffers_hdr[i];
             retain[i] = BUFFER_RETAIN_NOT_RETAIN;
         }
 
-        ret = ProcessorProcess(buffers, &retain[0], nr_ports);
+        if (!strncmp((char*)working_role, "video_decoder", 13)){
+            ret = ProcessorProcess(buffers, &retain[0], nr_ports);
+        }else{
+            ret = ProcessorProcess(buffers_hdr, &retain[0], nr_ports);
+        }
 
         if (ret == OMX_ErrorNone) {
             PostProcessBuffers(buffers, &retain[0]);
 
             for (i = 0; i < nr_ports; i++) {
-                if (retain[i] == BUFFER_RETAIN_GETAGAIN)
-                    ports[i]->RetainThisBuffer(buffers[i], false);
+
+                if(retain[i] == BUFFER_RETAIN_GETAGAIN)
+                    ports[i]->RetainThisBuffer(*buffers[i], false);
                 else if (retain[i] == BUFFER_RETAIN_ACCUMULATE)
-                    ports[i]->RetainThisBuffer(buffers[i], true);
+                    ports[i]->RetainThisBuffer(*buffers[i], true);
                 else
-                    ports[i]->ReturnThisBuffer(buffers[i]);
+                    ports[i]->ReturnThisBuffer(*buffers[i]);
             }
         }
         else {
@@ -1900,7 +1931,7 @@ void ComponentBase::Work(void)
 
             for (i = 0; i < nr_ports; i++) {
                 /* return buffers by hands, these buffers're not in queue */
-                ports[i]->ReturnThisBuffer(buffers[i]);
+                ports[i]->ReturnThisBuffer(*buffers[i]);
                 /* flush ports */
                 ports[i]->FlushPort();
             }
@@ -1912,6 +1943,10 @@ void ComponentBase::Work(void)
 
 bool ComponentBase::IsAllBufferAvailable(void)
 {
+
+    pthread_mutex_lock(&output_queue_lock);
+    PreProcessBufferQueue_Locked();
+
     OMX_U32 i;
     OMX_U32 nr_avail = 0;
 
@@ -1924,6 +1959,7 @@ bool ComponentBase::IsAllBufferAvailable(void)
         if (length)
             nr_avail++;
     }
+    pthread_mutex_unlock(&output_queue_lock);
 
     if (nr_avail == nr_ports)
         return true;
@@ -1932,7 +1968,7 @@ bool ComponentBase::IsAllBufferAvailable(void)
 }
 
 inline void ComponentBase::SourcePostProcessBuffers(
-    OMX_BUFFERHEADERTYPE **buffers,
+    OMX_BUFFERHEADERTYPE ***buffers,
     const buffer_retain_t *retain)
 {
     OMX_U32 i;
@@ -1942,14 +1978,13 @@ inline void ComponentBase::SourcePostProcessBuffers(
          * in case of source component, buffers're marked when they come
          * from the ouput ports
          */
-        if (!buffers[i]->hMarkTargetComponent) {
+        if (!(*buffers[i])->hMarkTargetComponent) {
             OMX_MARKTYPE *mark;
 
             mark = ports[i]->PopMark();
             if (mark) {
-                buffers[i]->hMarkTargetComponent =
-                    mark->hMarkTargetComponent;
-                buffers[i]->pMarkData = mark->pMarkData;
+                (*buffers[i])->hMarkTargetComponent = mark->hMarkTargetComponent;
+                (*buffers[i])->pMarkData = mark->pMarkData;
                 free(mark);
             }
         }
@@ -1957,7 +1992,7 @@ inline void ComponentBase::SourcePostProcessBuffers(
 }
 
 inline void ComponentBase::FilterPostProcessBuffers(
-    OMX_BUFFERHEADERTYPE **buffers,
+    OMX_BUFFERHEADERTYPE ***buffers,
     const buffer_retain_t *retain)
 {
     OMX_MARKTYPE *mark;
@@ -1972,8 +2007,8 @@ inline void ComponentBase::FilterPostProcessBuffers(
                 /* propagates EOS flag */
                 /* clear input EOS at the end of this loop */
                 if (retain[i] != BUFFER_RETAIN_GETAGAIN) {
-                    if (buffers[i]->nFlags & OMX_BUFFERFLAG_EOS)
-                        buffers[j]->nFlags |= OMX_BUFFERFLAG_EOS;
+                    if ((*buffers[i])->nFlags & OMX_BUFFERFLAG_EOS)
+                        (*buffers[j])->nFlags |= OMX_BUFFERFLAG_EOS;
                 }
 
                 /* propagates marks */
@@ -1981,64 +2016,64 @@ inline void ComponentBase::FilterPostProcessBuffers(
                  * if hMarkTargetComponent == handle then the mark's not
                  * propagated
                  */
-                if (buffers[i]->hMarkTargetComponent &&
-                    (buffers[i]->hMarkTargetComponent != handle)) {
-                    if (buffers[j]->hMarkTargetComponent) {
+                if ((*buffers[i])->hMarkTargetComponent &&
+                    ((*buffers[i])->hMarkTargetComponent != handle)) {
+                    if ((*buffers[j])->hMarkTargetComponent) {
                         mark = (OMX_MARKTYPE *)malloc(sizeof(*mark));
                         if (mark) {
                             mark->hMarkTargetComponent =
-                                buffers[i]->hMarkTargetComponent;
-                            mark->pMarkData = buffers[i]->pMarkData;
+                                (*buffers[i])->hMarkTargetComponent;
+                            mark->pMarkData = (*buffers[i])->pMarkData;
                             ports[j]->PushMark(mark);
                             mark = NULL;
-                            buffers[i]->hMarkTargetComponent = NULL;
-                            buffers[i]->pMarkData = NULL;
+                            (*buffers[i])->hMarkTargetComponent = NULL;
+                            (*buffers[i])->pMarkData = NULL;
                         }
                     }
                     else {
                         mark = ports[j]->PopMark();
                         if (mark) {
-                            buffers[j]->hMarkTargetComponent =
+                            (*buffers[j])->hMarkTargetComponent =
                                 mark->hMarkTargetComponent;
-                            buffers[j]->pMarkData = mark->pMarkData;
+                            (*buffers[j])->pMarkData = mark->pMarkData;
                             free(mark);
 
                             mark = (OMX_MARKTYPE *)malloc(sizeof(*mark));
                             if (mark) {
                                 mark->hMarkTargetComponent =
-                                    buffers[i]->hMarkTargetComponent;
-                                mark->pMarkData = buffers[i]->pMarkData;
+                                    (*buffers[i])->hMarkTargetComponent;
+                                mark->pMarkData = (*buffers[i])->pMarkData;
                                 ports[j]->PushMark(mark);
                                 mark = NULL;
-                                buffers[i]->hMarkTargetComponent = NULL;
-                                buffers[i]->pMarkData = NULL;
+                                (*buffers[i])->hMarkTargetComponent = NULL;
+                                (*buffers[i])->pMarkData = NULL;
                             }
                         }
                         else {
-                            buffers[j]->hMarkTargetComponent =
-                                buffers[i]->hMarkTargetComponent;
-                            buffers[j]->pMarkData = buffers[i]->pMarkData;
-                            buffers[i]->hMarkTargetComponent = NULL;
-                            buffers[i]->pMarkData = NULL;
+                            (*buffers[j])->hMarkTargetComponent =
+                                (*buffers[i])->hMarkTargetComponent;
+                            (*buffers[j])->pMarkData = (*buffers[i])->pMarkData;
+                            (*buffers[i])->hMarkTargetComponent = NULL;
+                            (*buffers[i])->pMarkData = NULL;
                         }
                     }
                 }
             }
             /* clear input buffer's EOS */
             if (retain[i] != BUFFER_RETAIN_GETAGAIN)
-                buffers[i]->nFlags &= ~OMX_BUFFERFLAG_EOS;
+                (*buffers[i])->nFlags &= ~OMX_BUFFERFLAG_EOS;
         }
     }
 }
 
 inline void ComponentBase::SinkPostProcessBuffers(
-    OMX_BUFFERHEADERTYPE **buffers,
+    OMX_BUFFERHEADERTYPE ***buffers,
     const buffer_retain_t *retain)
 {
     return;
 }
 
-void ComponentBase::PostProcessBuffers(OMX_BUFFERHEADERTYPE **buffers,
+void ComponentBase::PostProcessBuffers(OMX_BUFFERHEADERTYPE ***buffers,
                                        const buffer_retain_t *retain)
 {
 
@@ -2089,6 +2124,31 @@ OMX_ERRORTYPE ComponentBase::ProcessorFlush(OMX_U32 port_index)
 {
     return OMX_ErrorNone;
 }
+
+OMX_ERRORTYPE ComponentBase::PreProcessBuffer(OMX_BUFFERHEADERTYPE* buffer)
+{
+    return OMX_ErrorNone;
+}
+
+OMX_ERRORTYPE ComponentBase::PreProcessBufferQueue_Locked()
+{
+    return OMX_ErrorNone;
+}
+OMX_ERRORTYPE ComponentBase::ProcessorProcess(OMX_BUFFERHEADERTYPE **pBuffers,
+                                           buffer_retain_t *retain,
+                                           OMX_U32 nr_buffers)
+{
+    LOGE("ProcessorProcess not be implemented");
+    return OMX_ErrorNotImplemented;
+}
+OMX_ERRORTYPE ComponentBase::ProcessorProcess(OMX_BUFFERHEADERTYPE ***pBuffers,
+                                           buffer_retain_t *retain,
+                                           OMX_U32 nr_buffers)
+{
+    LOGE("ProcessorProcess not be implemented");
+    return OMX_ErrorNotImplemented;
+}
+
 
 /* end of processor callbacks */
 

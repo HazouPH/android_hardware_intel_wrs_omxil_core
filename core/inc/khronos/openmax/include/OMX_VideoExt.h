@@ -145,14 +145,6 @@ typedef struct OMX_VIDEO_PARAM_INTEL_ADAPTIVE_SLICE_CONTROL {
      OMX_U32 nSliceSizeSkipThreshold;     // Slice size skip threshold for adaptive slice control to start a new slice
 } OMX_VIDEO_PARAM_INTEL_ADAPTIVE_SLICE_CONTROL;
 
-//align with <media/stagefright/HardwareAPI.h>
-typedef struct StoreMetaDataInBuffersParams {
-    OMX_U32 nSize;                        // Size of the structure
-    OMX_VERSIONTYPE nVersion;             // OMX specification version
-    OMX_U32 nPortIndex;                   // Port that this struct applies to
-    OMX_BOOL bStoreMetaData;              // Enable/disable meta data input
-} StoreMetaDataInBuffersParams;
-
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

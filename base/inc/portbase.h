@@ -83,7 +83,11 @@ public:
     /* Empty/FillThisBuffer */
     OMX_ERRORTYPE PushThisBuffer(OMX_BUFFERHEADERTYPE *pBuffer);
     OMX_BUFFERHEADERTYPE *PopBuffer(void);
+    OMX_ERRORTYPE MixPushThisBuffer(OMX_BUFFERHEADERTYPE *pBuffer);
+    OMX_BUFFERHEADERTYPE *MixPopBuffer(void);
+    OMX_ERRORTYPE MixPushBufferHead(OMX_BUFFERHEADERTYPE *pBuffer);
     OMX_U32 BufferQueueLength(void);
+    OMX_U32 MixBufferQueueLength(void);
 
     /* Empty/FillBufferDone */
     OMX_ERRORTYPE ReturnThisBuffer(OMX_BUFFERHEADERTYPE *pBuffer);
@@ -142,6 +146,10 @@ private:
 
     struct queue bufferq;
     pthread_mutex_t bufferq_lock;
+
+    struct queue mixbufferq;
+    pthread_mutex_t mixbufferq_lock;
+
 
     /* retained buffers (only accumulated buffer) */
     struct queue retainedbufferq;

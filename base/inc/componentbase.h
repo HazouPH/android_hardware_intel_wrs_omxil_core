@@ -327,6 +327,9 @@ protected:
     /* ports big lock, must be held when accessing all ports at one time */
     pthread_mutex_t ports_block;
 
+    /*output queue lock for native buffer mode preprocess the buffer queue*/
+    pthread_mutex_t output_queue_lock;
+
 private:
     /* common routines for constructor */
     void __ComponentBase(void);
@@ -397,13 +400,13 @@ private:
     bool IsAllBufferAvailable(void);
 
     /* called in Work() after ProcessorProcess() */
-    void PostProcessBuffers(OMX_BUFFERHEADERTYPE **buffers,
+    void PostProcessBuffers(OMX_BUFFERHEADERTYPE ***buffers,
                             const buffer_retain_t *retain);
-    void SourcePostProcessBuffers(OMX_BUFFERHEADERTYPE **buffers,
+    void SourcePostProcessBuffers(OMX_BUFFERHEADERTYPE ***buffers,
                                   const buffer_retain_t *retain);
-    void FilterPostProcessBuffers(OMX_BUFFERHEADERTYPE **buffers,
+    void FilterPostProcessBuffers(OMX_BUFFERHEADERTYPE ***buffers,
                                   const buffer_retain_t *retain);
-    void SinkPostProcessBuffers(OMX_BUFFERHEADERTYPE **buffers,
+    void SinkPostProcessBuffers(OMX_BUFFERHEADERTYPE ***buffers,
                                 const buffer_retain_t *retain);
 
     /* processor callbacks */
@@ -415,11 +418,15 @@ private:
     virtual OMX_ERRORTYPE ProcessorPause(void); /* Executing to Pause */
     virtual OMX_ERRORTYPE ProcessorResume(void);/* Pause to Executing */
     virtual OMX_ERRORTYPE ProcessorFlush(OMX_U32 port_index); /* Flush */
-
+    virtual OMX_ERRORTYPE PreProcessBuffer(OMX_BUFFERHEADERTYPE* buffer);
+    virtual OMX_ERRORTYPE PreProcessBufferQueue_Locked();
     /* Work */
-    virtual OMX_ERRORTYPE ProcessorProcess(OMX_BUFFERHEADERTYPE **buffers,
+    virtual OMX_ERRORTYPE ProcessorProcess(OMX_BUFFERHEADERTYPE ***pBuffers,
                                            buffer_retain_t *retain,
-                                           OMX_U32 nr_buffers) = 0;
+                                           OMX_U32 nr_buffers);
+    virtual OMX_ERRORTYPE ProcessorProcess(OMX_BUFFERHEADERTYPE **pBuffers,
+                                           buffer_retain_t *retain,
+                                           OMX_U32 nr_buffers);
 
     /* end of component methods & helpers */
 
