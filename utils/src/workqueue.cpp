@@ -100,8 +100,12 @@ void WorkQueue::ResumeWork(void)
 
 void WorkQueue::Run(void)
 {
-    while (!stop) {
+    while (true) {
         pthread_mutex_lock(&wlock);
+        if (stop) {
+            pthread_mutex_unlock(&wlock);
+            break;
+        }
 
         if (!works) {
             pthread_mutex_lock(&executing_lock);
