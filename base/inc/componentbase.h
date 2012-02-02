@@ -420,6 +420,9 @@ private:
     virtual OMX_ERRORTYPE ProcessorFlush(OMX_U32 port_index); /* Flush */
     virtual OMX_ERRORTYPE PreProcessBuffer(OMX_BUFFERHEADERTYPE* buffer);
     virtual OMX_ERRORTYPE PreProcessBufferQueue_Locked();
+
+    /* invoked when buffer is to be freed */
+    virtual OMX_ERRORTYPE ProcessorPreFreeBuffer(OMX_U32 nPortIndex, OMX_BUFFERHEADERTYPE* pBuffer);
     /* Work */
     virtual OMX_ERRORTYPE ProcessorProcess(OMX_BUFFERHEADERTYPE ***pBuffers,
                                            buffer_retain_t *retain,

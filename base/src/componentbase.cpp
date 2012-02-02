@@ -998,6 +998,8 @@ OMX_ERRORTYPE ComponentBase::CBaseFreeBuffer(
     if (!port)
         return OMX_ErrorBadParameter;
 
+    ProcessorPreFreeBuffer(nPortIndex, pBuffer);
+
     return port->FreeBuffer(nPortIndex, pBuffer);
 }
 
@@ -2149,6 +2151,11 @@ OMX_ERRORTYPE ComponentBase::ProcessorProcess(OMX_BUFFERHEADERTYPE ***pBuffers,
     return OMX_ErrorNotImplemented;
 }
 
+OMX_ERRORTYPE ComponentBase::ProcessorPreFreeBuffer(OMX_U32 nPortIndex, OMX_BUFFERHEADERTYPE* pBuffer)
+{
+    return OMX_ErrorNone;
+
+}
 
 /* end of processor callbacks */
 
