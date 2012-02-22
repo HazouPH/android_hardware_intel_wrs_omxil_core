@@ -33,6 +33,7 @@ typedef enum buffer_retain_e {
     BUFFER_RETAIN_NOT_RETAIN = 0,
     BUFFER_RETAIN_GETAGAIN,
     BUFFER_RETAIN_ACCUMULATE,
+    BUFFER_RETAIN_OVERRIDDEN,
 } buffer_retain_t;
 
 /* ProcessCmdWork */
@@ -314,6 +315,9 @@ protected:
 
     void DumpBuffer(const OMX_BUFFERHEADERTYPE *bufferheader, bool dumpdata);
 
+    /* check if all port has own pending buffer */
+    virtual bool IsAllBufferAvailable(void);
+
     /* end of helpers for derived class */
 
     /* ports */
@@ -327,8 +331,6 @@ protected:
     /* ports big lock, must be held when accessing all ports at one time */
     pthread_mutex_t ports_block;
 
-    /*output queue lock for native buffer mode preprocess the buffer queue*/
-    pthread_mutex_t output_queue_lock;
 
 private:
     /* common routines for constructor */
@@ -396,8 +398,6 @@ private:
     /* buffer processing */
     /* implement WorkableInterface */
     virtual void Work(void); /* handle this->ports, hold ports_block */
-    /* check if all port has own pending buffer */
-    bool IsAllBufferAvailable(void);
 
     /* called in Work() after ProcessorProcess() */
     void PostProcessBuffers(OMX_BUFFERHEADERTYPE ***buffers,
@@ -418,8 +418,7 @@ private:
     virtual OMX_ERRORTYPE ProcessorPause(void); /* Executing to Pause */
     virtual OMX_ERRORTYPE ProcessorResume(void);/* Pause to Executing */
     virtual OMX_ERRORTYPE ProcessorFlush(OMX_U32 port_index); /* Flush */
-    virtual OMX_ERRORTYPE PreProcessBuffer(OMX_BUFFERHEADERTYPE* buffer);
-    virtual OMX_ERRORTYPE PreProcessBufferQueue_Locked();
+    virtual OMX_ERRORTYPE ProcessorPreFillBuffer(OMX_BUFFERHEADERTYPE* buffer);
 
     /* invoked when buffer is to be freed */
     virtual OMX_ERRORTYPE ProcessorPreFreeBuffer(OMX_U32 nPortIndex, OMX_BUFFERHEADERTYPE* pBuffer);

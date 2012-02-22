@@ -136,7 +136,6 @@ void ComponentBase::__ComponentBase(void)
     bufferwork = NULL;
 
     pthread_mutex_init(&ports_block, NULL);
-    pthread_mutex_init(&output_queue_lock, NULL);
 }
 
 ComponentBase::ComponentBase()
@@ -153,7 +152,6 @@ ComponentBase::ComponentBase(const OMX_STRING name)
 ComponentBase::~ComponentBase()
 {
     pthread_mutex_destroy(&ports_block);
-    pthread_mutex_destroy(&output_queue_lock);
 
     if (roles) {
         if (roles[0])
@@ -1125,13 +1123,11 @@ OMX_ERRORTYPE ComponentBase::CBaseFillThisBuffer(
             return OMX_ErrorIncorrectStateOperation;
     }
 
-    ret = PreProcessBuffer(pBuffer);
+    ret = ProcessorPreFillBuffer(pBuffer);
     if (ret != OMX_ErrorNone)
        return ret;
 
-    pthread_mutex_lock(&output_queue_lock);
     ret = port->PushThisBuffer(pBuffer);
-    pthread_mutex_unlock(&output_queue_lock);
     if (ret == OMX_ErrorNone)
         bufferwork->ScheduleWork(this);
 
@@ -1894,6 +1890,7 @@ void ComponentBase::Work(void)
 {
     OMX_BUFFERHEADERTYPE **buffers[nr_ports];
     OMX_BUFFERHEADERTYPE *buffers_hdr[nr_ports];
+    OMX_BUFFERHEADERTYPE *buffers_org[nr_ports];
     buffer_retain_t retain[nr_ports];
     OMX_U32 i;
     OMX_ERRORTYPE ret;
@@ -1905,6 +1902,7 @@ void ComponentBase::Work(void)
         for (i = 0; i < nr_ports; i++) {
             buffers_hdr[i] = ports[i]->PopBuffer();
             buffers[i] = &buffers_hdr[i];
+            buffers_org[i] = buffers_hdr[i];
             retain[i] = BUFFER_RETAIN_NOT_RETAIN;
         }
 
@@ -1918,13 +1916,17 @@ void ComponentBase::Work(void)
             PostProcessBuffers(buffers, &retain[0]);
 
             for (i = 0; i < nr_ports; i++) {
-
-                if(retain[i] == BUFFER_RETAIN_GETAGAIN)
+                if(retain[i] == BUFFER_RETAIN_GETAGAIN) {
                     ports[i]->RetainThisBuffer(*buffers[i], false);
-                else if (retain[i] == BUFFER_RETAIN_ACCUMULATE)
+                }
+                else if (retain[i] == BUFFER_RETAIN_ACCUMULATE) {
                     ports[i]->RetainThisBuffer(*buffers[i], true);
-                else
+                }
+                else if (retain[i] == BUFFER_RETAIN_OVERRIDDEN) {
+                    ports[i]->RetainAndReturnBuffer(buffers_org[i], *buffers[i]);
+                } else {
                     ports[i]->ReturnThisBuffer(*buffers[i]);
+                }
             }
         }
         else {
@@ -1945,10 +1947,6 @@ void ComponentBase::Work(void)
 
 bool ComponentBase::IsAllBufferAvailable(void)
 {
-
-    pthread_mutex_lock(&output_queue_lock);
-    PreProcessBufferQueue_Locked();
-
     OMX_U32 i;
     OMX_U32 nr_avail = 0;
 
@@ -1961,7 +1959,6 @@ bool ComponentBase::IsAllBufferAvailable(void)
         if (length)
             nr_avail++;
     }
-    pthread_mutex_unlock(&output_queue_lock);
 
     if (nr_avail == nr_ports)
         return true;
@@ -2127,15 +2124,11 @@ OMX_ERRORTYPE ComponentBase::ProcessorFlush(OMX_U32 port_index)
     return OMX_ErrorNone;
 }
 
-OMX_ERRORTYPE ComponentBase::PreProcessBuffer(OMX_BUFFERHEADERTYPE* buffer)
+OMX_ERRORTYPE ComponentBase::ProcessorPreFillBuffer(OMX_BUFFERHEADERTYPE* buffer)
 {
     return OMX_ErrorNone;
 }
 
-OMX_ERRORTYPE ComponentBase::PreProcessBufferQueue_Locked()
-{
-    return OMX_ErrorNone;
-}
 OMX_ERRORTYPE ComponentBase::ProcessorProcess(OMX_BUFFERHEADERTYPE **pBuffers,
                                            buffer_retain_t *retain,
                                            OMX_U32 nr_buffers)

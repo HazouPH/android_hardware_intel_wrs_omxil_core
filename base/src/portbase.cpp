@@ -45,9 +45,6 @@ void PortBase::__PortBase(void)
     __queue_init(&bufferq);
     pthread_mutex_init(&bufferq_lock, NULL);
 
-    __queue_init(&mixbufferq);
-    pthread_mutex_init(&mixbufferq_lock, NULL);
-
     __queue_init(&retainedbufferq);
     pthread_mutex_init(&retainedbufferq_lock, NULL);
 
@@ -100,9 +97,6 @@ PortBase::~PortBase()
     /* should've been already freed at buffer processing */
     queue_free_all(&bufferq);
     pthread_mutex_destroy(&bufferq_lock);
-
-    queue_free_all(&mixbufferq);
-    pthread_mutex_destroy(&mixbufferq_lock);
 
     /* should've been already freed at buffer processing */
     queue_free_all(&retainedbufferq);
@@ -573,57 +567,6 @@ OMX_BUFFERHEADERTYPE *PortBase::PopBuffer(void)
     return buffer;
 }
 
-OMX_ERRORTYPE PortBase::MixPushThisBuffer(OMX_BUFFERHEADERTYPE *pBuffer)
-{
-    int ret;
-
-    LOGV_IF(pBuffer != NULL, "%s(): %s:%s:PortIndex %lu:pBuffer %p:\n",
-            __FUNCTION__, cbase->GetName(), cbase->GetWorkingRole(),
-            portdefinition.nPortIndex, pBuffer);
-
-    pthread_mutex_lock(&mixbufferq_lock);
-    ret = queue_push_tail(&mixbufferq, pBuffer);
-    pthread_mutex_unlock(&mixbufferq_lock);
-
-    if (ret)
-        return OMX_ErrorInsufficientResources;
-
-    return OMX_ErrorNone;
-}
-
-OMX_BUFFERHEADERTYPE *PortBase::MixPopBuffer(void)
-{
-    OMX_BUFFERHEADERTYPE *buffer;
-
-    pthread_mutex_lock(&mixbufferq_lock);
-    buffer = (OMX_BUFFERHEADERTYPE *)queue_pop_head(&mixbufferq);
-    pthread_mutex_unlock(&mixbufferq_lock);
-
-    LOGV_IF(buffer != NULL, "%s(): %s:%s:PortIndex %lu:pBuffer %p:\n",
-            __FUNCTION__, cbase->GetName(), cbase->GetWorkingRole(),
-            portdefinition.nPortIndex, buffer);
-
-    return buffer;
-}
-
-OMX_ERRORTYPE PortBase::MixPushBufferHead(OMX_BUFFERHEADERTYPE *pBuffer)
-{
-    int ret;
-
-    LOGV_IF(pBuffer != NULL, "%s(): %s:%s:PortIndex %lu:pBuffer %p:\n",
-            __FUNCTION__, cbase->GetName(), cbase->GetWorkingRole(),
-            portdefinition.nPortIndex, pBuffer);
-
-    pthread_mutex_lock(&mixbufferq_lock);
-    ret = queue_push_head(&mixbufferq,pBuffer);
-    pthread_mutex_unlock(&mixbufferq_lock);
-
-    if (ret)
-        return OMX_ErrorInsufficientResources;
-
-    return OMX_ErrorNone;
-}
-
 OMX_U32 PortBase::BufferQueueLength(void)
 {
     OMX_U32 length;
@@ -634,18 +577,6 @@ OMX_U32 PortBase::BufferQueueLength(void)
 
     return length;
 }
-
-OMX_U32 PortBase::MixBufferQueueLength(void)
-{
-    OMX_U32 length;
-
-    pthread_mutex_lock(&mixbufferq_lock);
-    length = queue_length(&mixbufferq);
-    pthread_mutex_unlock(&mixbufferq_lock);
-
-    return length;
-}
-
 
 OMX_ERRORTYPE PortBase::ReturnThisBuffer(OMX_BUFFERHEADERTYPE *pBuffer)
 {
@@ -724,6 +655,35 @@ OMX_ERRORTYPE PortBase::ReturnThisBuffer(OMX_BUFFERHEADERTYPE *pBuffer)
          ret);
 
     return OMX_ErrorNone;
+}
+
+OMX_ERRORTYPE PortBase::RetainAndReturnBuffer( OMX_BUFFERHEADERTYPE *pRetain, OMX_BUFFERHEADERTYPE *pReturn)
+{
+    OMX_ERRORTYPE ret;
+    OMX_U32 length;
+    if (pReturn == pRetain) {
+        return ReturnThisBuffer(pReturn);
+    }
+    ret = RetainThisBuffer(pRetain, false);
+    if (ret != OMX_ErrorNone) {
+        return ret;
+    }
+
+    pthread_mutex_lock(&bufferq_lock);
+    length = queue_length(&bufferq);
+    OMX_BUFFERHEADERTYPE *p;
+    /* remove returned buffer from the queue */
+    for (OMX_U32 i = 0; i < length; i++) {
+        p = (OMX_BUFFERHEADERTYPE *)queue_pop_head(&bufferq);
+        if (p == pReturn) {
+            break;
+        }
+        queue_push_tail(&bufferq, p);
+    }
+
+    pthread_mutex_unlock(&bufferq_lock);
+
+    return ReturnThisBuffer(pReturn);
 }
 
 /* retain buffer */
@@ -829,9 +789,6 @@ OMX_ERRORTYPE PortBase::FlushPort(void)
     ReturnAllRetainedBuffers();
 
     while ((buffer = PopBuffer()))
-        ReturnThisBuffer(buffer);
-
-    while ((buffer = MixPopBuffer()))
         ReturnThisBuffer(buffer);
 
     LOGV("%s(): %s:%s:PortIndex %lu: exit\n", __FUNCTION__,
