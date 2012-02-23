@@ -42,7 +42,8 @@ CModule::CModule(const OMX_STRING lname)
     memset(cname, 0, OMX_MAX_STRINGNAME_SIZE);
 
     memset(this->lname, 0, OMX_MAX_STRINGNAME_SIZE);
-    strncpy(this->lname, lname, OMX_MAX_STRINGNAME_SIZE);
+   // strncpy(this->name, name, OMX_MAX_STRINGNAME_SIZE);
+    strncpy(this->lname, lname, (strlen(lname) < OMX_MAX_STRINGNAME_SIZE) ? strlen(lname) : OMX_MAX_STRINGNAME_SIZE);
     this->lname[OMX_MAX_STRINGNAME_SIZE-1] = '\0';
 }
 
