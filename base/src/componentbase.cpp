@@ -764,18 +764,22 @@ OMX_ERRORTYPE ComponentBase::CBaseGetExtensionIndex(
         return OMX_ErrorNone;
     }
 
-    if(!strcmp(cParameterName, "OMX.google.android.index.enableAndroidNativeBuffers")) {
+    if (!strcmp(cParameterName, "OMX.google.android.index.enableAndroidNativeBuffers")) {
         *pIndexType = static_cast<OMX_INDEXTYPE>(OMX_IndexExtEnableNativeBuffer);
         return OMX_ErrorNone;
     }
 
-    if(!strcmp(cParameterName, "OMX.google.android.index.getAndroidNativeBufferUsage")) {
+    if (!strcmp(cParameterName, "OMX.google.android.index.getAndroidNativeBufferUsage")) {
         *pIndexType = static_cast<OMX_INDEXTYPE>(OMX_IndexExtGetNativeBufferUsage);
         return OMX_ErrorNone;
     }
 
-    if(!strcmp(cParameterName, "OMX.google.android.index.useAndroidNativeBuffer")) {
+    if (!strcmp(cParameterName, "OMX.google.android.index.useAndroidNativeBuffer")) {
         *pIndexType = static_cast<OMX_INDEXTYPE>(OMX_IndexExtUseNativeBuffer);
+        return OMX_ErrorNone;
+    }
+    if (!strcmp(cParameterName, "OMX.Intel.index.rotation")) {
+        *pIndexType = static_cast<OMX_INDEXTYPE>(OMX_IndexExtRotationDegrees);
         return OMX_ErrorNone;
     }
 

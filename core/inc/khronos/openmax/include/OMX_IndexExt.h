@@ -90,6 +90,7 @@ typedef enum OMX_INDEXEXTTYPE {
     OMX_IndexExtEnableNativeBuffer,                 /**<reference: EnableNativeBuffer */
     OMX_IndexExtGetNativeBufferUsage,               /**<reference: GetNativeBufferUsage  */
     OMX_IndexExtUseNativeBuffer,                    /**<reference: UseNativeBuffer  */
+    OMX_IndexExtRotationDegrees,                    /**<reference: Rotation for decode*/
     OMX_IndexExtMax = 0x7FFFFFFF
 } OMX_INDEXEXTTYPE;
 
