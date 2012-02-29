@@ -39,6 +39,10 @@ void PortBase::__PortBase(void)
     nr_buffer_hdrs = 0;
     buffer_hdrs_completion = false;
 
+    custom_mem_alloc = NULL;
+    custom_mem_free = NULL;
+    custom_mem_userdata = NULL;
+
     pthread_mutex_init(&hdrs_lock, NULL);
     pthread_cond_init(&hdrs_wait, NULL);
 
@@ -138,6 +142,15 @@ OMX_ERRORTYPE PortBase::SetCallbacks(OMX_HANDLETYPE hComponent,
 
     return OMX_ErrorNone;
 }
+
+OMX_ERRORTYPE PortBase::SetMemAllocator(CustomMemAlloc *pMemAlloc, CustomMemFree *pMemFree, OMX_PTR pUserData)
+{
+    custom_mem_alloc = pMemAlloc;
+    custom_mem_free = pMemFree;
+    custom_mem_userdata = pUserData;
+    return OMX_ErrorNone;
+}
+
 
 
 OMX_U32 PortBase::getFrameBufSize(OMX_COLOR_FORMATTYPE colorFormat, OMX_U32 width, OMX_U32 height)
@@ -372,7 +385,7 @@ OMX_ERRORTYPE PortBase::UseBuffer(OMX_BUFFERHEADERTYPE **ppBufferHdr,
     return OMX_ErrorNone;
 }
 
-OMX_ERRORTYPE PortBase::AllocateBuffer(OMX_BUFFERHEADERTYPE **ppBuffer,
+OMX_ERRORTYPE PortBase:: AllocateBuffer(OMX_BUFFERHEADERTYPE **ppBuffer,
                                        OMX_U32 nPortIndex,
                                        OMX_PTR pAppPrivate,
                                        OMX_U32 nSizeBytes)
@@ -392,8 +405,12 @@ OMX_ERRORTYPE PortBase::AllocateBuffer(OMX_BUFFERHEADERTYPE **ppBuffer,
         return OMX_ErrorNone;
     }
 
-    buffer_hdr = (OMX_BUFFERHEADERTYPE *)
-                 calloc(1, sizeof(*buffer_hdr) + nSizeBytes);
+    if (custom_mem_alloc) {
+        buffer_hdr = (OMX_BUFFERHEADERTYPE *) calloc(1, sizeof(*buffer_hdr));
+    } else {
+        buffer_hdr = (OMX_BUFFERHEADERTYPE *) calloc(1, sizeof(*buffer_hdr) + nSizeBytes);
+    }
+
     if (!buffer_hdr) {
         pthread_mutex_unlock(&hdrs_lock);
         LOGE("%s(): %s:%s:PortIndex %lu: exit failure, "
@@ -413,7 +430,15 @@ OMX_ERRORTYPE PortBase::AllocateBuffer(OMX_BUFFERHEADERTYPE **ppBuffer,
     }
 
     ComponentBase::SetTypeHeader(buffer_hdr, sizeof(*buffer_hdr));
-    buffer_hdr->pBuffer = (OMX_U8 *)buffer_hdr + sizeof(*buffer_hdr);
+    if (custom_mem_alloc) {
+        buffer_hdr->pBuffer = (*custom_mem_alloc)(nSizeBytes, custom_mem_userdata);
+    } else {
+        buffer_hdr->pBuffer = (OMX_U8 *)buffer_hdr + sizeof(*buffer_hdr);
+    }
+    if (buffer_hdr->pBuffer == NULL) {
+        return OMX_ErrorInsufficientResources;
+    }
+
     buffer_hdr->nAllocLen = nSizeBytes;
     buffer_hdr->pAppPrivate = pAppPrivate;
     if (portdefinition.eDir == OMX_DirInput) {
@@ -498,7 +523,10 @@ OMX_ERRORTYPE PortBase::FreeBuffer(OMX_U32 nPortIndex,
     LOGV("%s(): %s:%s:PortIndex %lu:pBuffer %p: free a buffer (%lu/%lu)\n",
          __FUNCTION__, cbase->GetName(), cbase->GetWorkingRole(), nPortIndex,
          pBuffer, nr_buffer_hdrs, portdefinition.nBufferCountActual);
-
+    if (custom_mem_free) {
+        (*custom_mem_free)(pBuffer->pBuffer, custom_mem_userdata);
+        pBuffer->pBuffer = NULL;
+    }
     free(pBuffer);
 
     portdefinition.bPopulated = OMX_FALSE;

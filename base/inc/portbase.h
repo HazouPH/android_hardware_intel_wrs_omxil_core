@@ -27,6 +27,9 @@
 #include <list.h>
 #include <queue.h>
 
+typedef OMX_U8* CustomMemAlloc(OMX_U32 nSizeBytes, OMX_PTR pUserData);
+typedef void  CustomMemFree(OMX_U8 *pBuffer, OMX_PTR pUserData);
+
 class PortBase
 {
 public:
@@ -51,6 +54,8 @@ public:
                                OMX_CALLBACKTYPE *pCallbacks,
                                OMX_PTR pAppData);
     /* end of accessor */
+
+    OMX_ERRORTYPE SetMemAllocator(CustomMemAlloc *pMemAlloc, CustomMemFree *pMemFree, OMX_PTR pUserData);
 
     /*
      * component methods & helpers
@@ -156,6 +161,10 @@ private:
     /* state */
     OMX_U8 state;
     pthread_mutex_t state_lock;
+
+    CustomMemAlloc *custom_mem_alloc;
+    CustomMemFree *custom_mem_free;
+    OMX_PTR custom_mem_userdata;
 
     /* parameter */
     OMX_PARAM_PORTDEFINITIONTYPE portdefinition;
