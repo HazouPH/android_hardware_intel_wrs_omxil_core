@@ -1935,8 +1935,6 @@ void ComponentBase::Work(void)
             }
         }
         else {
-            callbacks->EventHandler(handle, appdata, OMX_EventError, ret,
-                                    0, NULL);
 
             for (i = 0; i < nr_ports; i++) {
                 /* return buffers by hands, these buffers're not in queue */
@@ -1944,6 +1942,9 @@ void ComponentBase::Work(void)
                 /* flush ports */
                 ports[i]->FlushPort();
             }
+
+            callbacks->EventHandler(handle, appdata, OMX_EventError, ret,
+                                    0, NULL);
         }
     }
 
