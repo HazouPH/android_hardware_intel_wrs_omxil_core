@@ -168,7 +168,7 @@ ComponentBase::~ComponentBase()
 /* name */
 void ComponentBase::SetName(const OMX_STRING name)
 {
-    strncpy(this->name, name, (strlen(name) < OMX_MAX_STRINGNAME_SIZE) ? strlen(name) : OMX_MAX_STRINGNAME_SIZE);
+    strncpy(this->name, name, (strlen(name) < OMX_MAX_STRINGNAME_SIZE) ? strlen(name) : (OMX_MAX_STRINGNAME_SIZE-1));
    // strncpy(this->name, name, OMX_MAX_STRINGNAME_SIZE);
     this->name[OMX_MAX_STRINGNAME_SIZE-1] = '\0';
 }
