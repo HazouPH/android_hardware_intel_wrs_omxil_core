@@ -1739,8 +1739,10 @@ void ComponentBase::TransStatePort(OMX_U32 port_index, OMX_U8 state)
         ret = ports[i]->TransState(state);
         if (ret == OMX_ErrorNone) {
             event = OMX_EventCmdComplete;
-            if (state == PortBase::OMX_PortEnabled)
+            if (state == PortBase::OMX_PortEnabled) {
                 data1 = OMX_CommandPortEnable;
+                ProcessorReset();
+            }
             else
                 data1 = OMX_CommandPortDisable;
             data2 = i;
@@ -2109,6 +2111,12 @@ OMX_ERRORTYPE ComponentBase::ProcessorStart(void)
 {
     return OMX_ErrorNone;
 }
+
+OMX_ERRORTYPE ComponentBase::ProcessorReset(void)
+{
+    return OMX_ErrorNone;
+}
+
 
 OMX_ERRORTYPE ComponentBase::ProcessorStop(void)
 {

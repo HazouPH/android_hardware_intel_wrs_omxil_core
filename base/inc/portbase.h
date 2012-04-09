@@ -115,6 +115,7 @@ public:
 
     /* EventHandler(OMX_EventPortSettingChanged) */
     OMX_ERRORTYPE ReportPortSettingsChanged(void);
+    OMX_ERRORTYPE ReportOutputCrop(void);
     /* get frame size */
     OMX_U32 getFrameBufSize(OMX_COLOR_FORMATTYPE colorFormat, OMX_U32 width, OMX_U32 height);
 

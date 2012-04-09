@@ -945,6 +945,18 @@ OMX_ERRORTYPE PortBase::ReportPortSettingsChanged(void)
     return ret;
 }
 
+OMX_ERRORTYPE PortBase::ReportOutputCrop(void)
+{
+    OMX_ERRORTYPE ret;
+
+    ret = callbacks->EventHandler(owner, appdata,
+                                  OMX_EventPortSettingsChanged,
+                                  portdefinition.nPortIndex,OMX_IndexConfigCommonOutputCrop, NULL);
+
+    return ret;
+}
+
+
 /* end of component methods & helpers */
 
 /* end of PortBase */

@@ -414,6 +414,7 @@ private:
     virtual OMX_ERRORTYPE ProcessorInit(void);  /* Loaded to Idle */
     virtual OMX_ERRORTYPE ProcessorDeinit(void);/* Idle to Loaded */
     virtual OMX_ERRORTYPE ProcessorStart(void); /* Idle to Executing/Pause */
+    virtual OMX_ERRORTYPE ProcessorReset(void); /* Reset */
     virtual OMX_ERRORTYPE ProcessorStop(void);  /* Executing/Pause to Idle */
     virtual OMX_ERRORTYPE ProcessorPause(void); /* Executing to Pause */
     virtual OMX_ERRORTYPE ProcessorResume(void);/* Pause to Executing */
