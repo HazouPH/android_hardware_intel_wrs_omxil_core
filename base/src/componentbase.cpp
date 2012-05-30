@@ -1128,9 +1128,7 @@ OMX_ERRORTYPE ComponentBase::CBaseFillThisBuffer(
             return OMX_ErrorIncorrectStateOperation;
     }
 
-    ret = ProcessorPreFillBuffer(pBuffer);
-    if (ret != OMX_ErrorNone)
-       return ret;
+    ProcessorPreFillBuffer(pBuffer);
 
     ret = port->PushThisBuffer(pBuffer);
     if (ret == OMX_ErrorNone)
