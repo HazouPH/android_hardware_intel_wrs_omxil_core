@@ -1296,10 +1296,9 @@ void ComponentBase::CmdHandler(struct cmd_s *cmd)
     }
     case OMX_CommandFlush: {
         OMX_U32 port_index = cmd->param1;
-
-        FlushPort(port_index, 1);
         pthread_mutex_lock(&ports_block);
         ProcessorFlush(port_index);
+        FlushPort(port_index, 1);
         pthread_mutex_unlock(&ports_block);
         break;
     }
@@ -1497,7 +1496,9 @@ inline OMX_ERRORTYPE ComponentBase::TransStateToIdle(OMX_STATETYPE current)
         }
     }
     else if ((current == OMX_StatePause) || (current == OMX_StateExecuting)) {
+        pthread_mutex_lock(&ports_block);
         FlushPort(OMX_ALL, 0);
+        pthread_mutex_unlock(&ports_block);
         LOGV("%s:%s: flushed all ports\n", GetName(), GetWorkingRole());
 
         bufferwork->CancelScheduledWork(this);
@@ -1695,14 +1696,12 @@ void ComponentBase::FlushPort(OMX_U32 port_index, bool notify)
     LOGV("%s:%s: flush ports (from index %lu to %lu)\n",
          GetName(), GetWorkingRole(), from_index, to_index);
 
-    pthread_mutex_lock(&ports_block);
     for (i = from_index; i <= to_index; i++) {
         ports[i]->FlushPort();
         if (notify)
             callbacks->EventHandler(handle, appdata, OMX_EventCmdComplete,
                                     OMX_CommandFlush, i, NULL);
     }
-    pthread_mutex_unlock(&ports_block);
 
     LOGV("%s:%s: flush ports done\n", GetName(), GetWorkingRole());
 }
@@ -1911,7 +1910,7 @@ void ComponentBase::Work(void)
             retain[i] = BUFFER_RETAIN_NOT_RETAIN;
         }
 
-        if (!strncmp((char*)working_role, "video_decoder", 13)){
+        if (working_role != NULL && !strncmp((char*)working_role, "video_decoder", 13)){
             ret = ProcessorProcess(buffers, &retain[0], nr_ports);
         }else{
             ret = ProcessorProcess(buffers_hdr, &retain[0], nr_ports);
