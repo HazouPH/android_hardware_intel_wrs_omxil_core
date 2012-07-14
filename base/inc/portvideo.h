@@ -39,8 +39,8 @@ public:
     const OMX_VIDEO_PARAM_BITRATETYPE *GetPortBitrateParam(void);
     
     OMX_ERRORTYPE SetPortPrivateInfoParam(
-         const OMX_VIDEO_CONFIG_PRI_INFOTYPE *privateinfoparam, bool internal);
-    const OMX_VIDEO_CONFIG_PRI_INFOTYPE *GetPortPrivateInfoParam(void);
+         const struct OMX_VIDEO_CONFIG_PRI_INFOTYPE *privateinfoparam, bool internal);
+    const struct OMX_VIDEO_CONFIG_PRI_INFOTYPE *GetPortPrivateInfoParam(void);
 
     OMX_ERRORTYPE SetPortBufferSharingInfo(OMX_BOOL isbufsharing);
     const OMX_BOOL *GetPortBufferSharingInfo(void);
@@ -51,7 +51,7 @@ private:
 
     OMX_VIDEO_PARAM_BITRATETYPE bitrateparam;
     
-    OMX_VIDEO_CONFIG_PRI_INFOTYPE  privateinfoparam;
+    struct OMX_VIDEO_CONFIG_PRI_INFOTYPE  privateinfoparam;
 
     OMX_BOOL mbufsharing;
 };
