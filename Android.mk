@@ -43,8 +43,9 @@ include $(CLEAR_VARS)
 
 WRS_OMXIL_CORE_ROOT := $(LOCAL_PATH)
 
-PRODUCT_COPY_FILES += \
-	$(LOCAL_PATH)/10_wrs_omxil_core.cfg:system/etc/10_wrs_omxil_core.cfg
+$(info WARNING: PRODUCT_COPY_FILES disabled in $(LOCAL_PATH))
+#PRODUCT_COPY_FILES += \
+#	$(LOCAL_PATH)/10_wrs_omxil_core.cfg:system/etc/10_wrs_omxil_core.cfg
 #$(call add-prebuilt-files, ETC, 10_wrs_omxil_core.cfg)
 
 COMPONENT_SUPPORT_BUFFER_SHARING := false
