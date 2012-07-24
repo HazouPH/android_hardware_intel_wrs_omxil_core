@@ -43,6 +43,8 @@ void PortBase::__PortBase(void)
     custom_mem_free = NULL;
     custom_mem_userdata = NULL;
 
+    mem_alignment = 0;
+
     pthread_mutex_init(&hdrs_lock, NULL);
     pthread_cond_init(&hdrs_wait, NULL);
 
@@ -151,7 +153,11 @@ OMX_ERRORTYPE PortBase::SetMemAllocator(CustomMemAlloc *pMemAlloc, CustomMemFree
     return OMX_ErrorNone;
 }
 
-
+OMX_ERRORTYPE PortBase::SetMemAlignment(OMX_U32 nAlignment)
+{
+    mem_alignment = nAlignment;
+    return OMX_ErrorNone;
+}
 
 OMX_U32 PortBase::getFrameBufSize(OMX_COLOR_FORMATTYPE colorFormat, OMX_U32 width, OMX_U32 height)
 {
@@ -408,7 +414,10 @@ OMX_ERRORTYPE PortBase:: AllocateBuffer(OMX_BUFFERHEADERTYPE **ppBuffer,
     if (custom_mem_alloc) {
         buffer_hdr = (OMX_BUFFERHEADERTYPE *) calloc(1, sizeof(*buffer_hdr));
     } else {
-        buffer_hdr = (OMX_BUFFERHEADERTYPE *) calloc(1, sizeof(*buffer_hdr) + nSizeBytes);
+        if (mem_alignment > 0)
+            buffer_hdr = (OMX_BUFFERHEADERTYPE *) calloc(1, sizeof(*buffer_hdr) + nSizeBytes + mem_alignment);
+        else
+            buffer_hdr = (OMX_BUFFERHEADERTYPE *) calloc(1, sizeof(*buffer_hdr) + nSizeBytes);
     }
 
     if (!buffer_hdr) {
@@ -433,7 +442,10 @@ OMX_ERRORTYPE PortBase:: AllocateBuffer(OMX_BUFFERHEADERTYPE **ppBuffer,
     if (custom_mem_alloc) {
         buffer_hdr->pBuffer = (*custom_mem_alloc)(nSizeBytes, custom_mem_userdata);
     } else {
-        buffer_hdr->pBuffer = (OMX_U8 *)buffer_hdr + sizeof(*buffer_hdr);
+        if (mem_alignment > 0)
+            buffer_hdr->pBuffer = (OMX_U8 *)(((OMX_U32)((OMX_U8 *)buffer_hdr + sizeof(*buffer_hdr)) / mem_alignment + 1) * mem_alignment);
+        else
+            buffer_hdr->pBuffer = (OMX_U8 *)buffer_hdr + sizeof(*buffer_hdr);
     }
     if (buffer_hdr->pBuffer == NULL) {
         return OMX_ErrorInsufficientResources;

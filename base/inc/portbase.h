@@ -57,6 +57,9 @@ public:
 
     OMX_ERRORTYPE SetMemAllocator(CustomMemAlloc *pMemAlloc, CustomMemFree *pMemFree, OMX_PTR pUserData);
 
+    /* set port buffer alignment, nAlignment=0 means alignment disabled */
+    OMX_ERRORTYPE SetMemAlignment(OMX_U32 nAlignment);
+
     /*
      * component methods & helpers
      */
@@ -165,6 +168,8 @@ private:
     CustomMemAlloc *custom_mem_alloc;
     CustomMemFree *custom_mem_free;
     OMX_PTR custom_mem_userdata;
+
+    OMX_U32 mem_alignment;
 
     /* parameter */
     OMX_PARAM_PORTDEFINITIONTYPE portdefinition;
