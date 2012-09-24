@@ -997,6 +997,8 @@ OMX_ERRORTYPE ComponentBase::CBaseEmptyThisBuffer(
         }
     }
 
+    ProcessorPreEmptyBuffer(pBuffer);
+
     ret = port->PushThisBuffer(pBuffer);
     if (ret == OMX_ErrorNone)
         bufferwork->ScheduleWork(this);
@@ -1795,6 +1797,9 @@ void ComponentBase::Work(void)
                 }
                 else if (retain[i] == BUFFER_RETAIN_OVERRIDDEN) {
                     ports[i]->RetainAndReturnBuffer(buffers_org[i], *buffers[i]);
+                }
+                else if (retain[i] == BUFFER_RETAIN_CACHE) {
+                    //nothing to do
                 } else {
                     ports[i]->ReturnThisBuffer(*buffers[i]);
                 }
@@ -2003,6 +2008,11 @@ OMX_ERRORTYPE ComponentBase::ProcessorFlush(OMX_U32 port_index)
 }
 
 OMX_ERRORTYPE ComponentBase::ProcessorPreFillBuffer(OMX_BUFFERHEADERTYPE* buffer)
+{
+    return OMX_ErrorNone;
+}
+
+OMX_ERRORTYPE ComponentBase::ProcessorPreEmptyBuffer(OMX_BUFFERHEADERTYPE* buffer)
 {
     return OMX_ErrorNone;
 }
