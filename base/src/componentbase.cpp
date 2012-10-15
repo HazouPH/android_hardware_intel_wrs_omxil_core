@@ -1256,7 +1256,7 @@ OMX_ERRORTYPE ComponentBase::CBaseComponentRoleEnum(
     if (hComponent != (OMX_HANDLETYPE *)this->handle)
         return OMX_ErrorBadParameter;
 
-    if (nIndex > nr_roles)
+    if (nIndex >= nr_roles)
         return OMX_ErrorBadParameter;
 
     strncpy((char *)cRole, (const char *)roles[nIndex],
