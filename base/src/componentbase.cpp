@@ -268,7 +268,7 @@ OMX_ERRORTYPE ComponentBase::GetHandle(OMX_HANDLETYPE *pHandle,
     handle->pApplicationPrivate = pAppData;
 
     /* connect handle's functions */
-    handle->GetComponentVersion = GetComponentVersion;
+    handle->GetComponentVersion = NULL;
     handle->SendCommand = SendCommand;
     handle->GetParameter = GetParameter;
     handle->SetParameter = SetParameter;
@@ -276,15 +276,15 @@ OMX_ERRORTYPE ComponentBase::GetHandle(OMX_HANDLETYPE *pHandle,
     handle->SetConfig = SetConfig;
     handle->GetExtensionIndex = GetExtensionIndex;
     handle->GetState = GetState;
-    handle->ComponentTunnelRequest = ComponentTunnelRequest;
+    handle->ComponentTunnelRequest = NULL;
     handle->UseBuffer = UseBuffer;
     handle->AllocateBuffer = AllocateBuffer;
     handle->FreeBuffer = FreeBuffer;
     handle->EmptyThisBuffer = EmptyThisBuffer;
     handle->FillThisBuffer = FillThisBuffer;
     handle->SetCallbacks = SetCallbacks;
-    handle->ComponentDeInit = ComponentDeInit;
-    handle->UseEGLImage = UseEGLImage;
+    handle->ComponentDeInit = NULL;
+    handle->UseEGLImage = NULL;
     handle->ComponentRoleEnum = ComponentRoleEnum;
 
     appdata = pAppData;
@@ -348,44 +348,6 @@ OMX_ERRORTYPE ComponentBase::FreeHandle(OMX_HANDLETYPE hComponent)
 /*
  * component methods & helpers
  */
-OMX_ERRORTYPE ComponentBase::GetComponentVersion(
-    OMX_IN  OMX_HANDLETYPE hComponent,
-    OMX_OUT OMX_STRING pComponentName,
-    OMX_OUT OMX_VERSIONTYPE* pComponentVersion,
-    OMX_OUT OMX_VERSIONTYPE* pSpecVersion,
-    OMX_OUT OMX_UUIDTYPE* pComponentUUID)
-{
-    ComponentBase *cbase;
-
-    if (!hComponent)
-        return OMX_ErrorBadParameter;
-
-    cbase = static_cast<ComponentBase *>
-        (((OMX_COMPONENTTYPE *)hComponent)->pComponentPrivate);
-    if (!cbase)
-        return OMX_ErrorBadParameter;
-
-    return cbase->CBaseGetComponentVersion(hComponent,
-                                           pComponentName,
-                                           pComponentVersion,
-                                           pSpecVersion,
-                                           pComponentUUID);
-}
-
-OMX_ERRORTYPE ComponentBase::CBaseGetComponentVersion(
-    OMX_IN  OMX_HANDLETYPE hComponent,
-    OMX_OUT OMX_STRING pComponentName,
-    OMX_OUT OMX_VERSIONTYPE* pComponentVersion,
-    OMX_OUT OMX_VERSIONTYPE* pSpecVersion,
-    OMX_OUT OMX_UUIDTYPE* pComponentUUID)
-{
-    /*
-     * Todo
-     */
-
-    return OMX_ErrorNotImplemented;
-}
-
 OMX_ERRORTYPE ComponentBase::SendCommand(
     OMX_IN  OMX_HANDLETYPE hComponent,
     OMX_IN  OMX_COMMANDTYPE Cmd,
@@ -813,43 +775,6 @@ OMX_ERRORTYPE ComponentBase::CBaseGetState(
     *pState = state;
     return OMX_ErrorNone;
 }
-
-OMX_ERRORTYPE ComponentBase::ComponentTunnelRequest(
-    OMX_IN  OMX_HANDLETYPE hComponent,
-    OMX_IN  OMX_U32 nPort,
-    OMX_IN  OMX_HANDLETYPE hTunneledComponent,
-    OMX_IN  OMX_U32 nTunneledPort,
-    OMX_INOUT  OMX_TUNNELSETUPTYPE* pTunnelSetup)
-{
-    ComponentBase *cbase;
-
-    if (!hComponent)
-        return OMX_ErrorBadParameter;
-
-    cbase = static_cast<ComponentBase *>
-        (((OMX_COMPONENTTYPE *)hComponent)->pComponentPrivate);
-    if (!cbase)
-        return OMX_ErrorBadParameter;
-
-    return cbase->CBaseComponentTunnelRequest(hComponent, nPort,
-                                              hTunneledComponent,
-                                              nTunneledPort, pTunnelSetup);
-}
-
-OMX_ERRORTYPE ComponentBase::CBaseComponentTunnelRequest(
-    OMX_IN  OMX_HANDLETYPE hComp,
-    OMX_IN  OMX_U32 nPort,
-    OMX_IN  OMX_HANDLETYPE hTunneledComp,
-    OMX_IN  OMX_U32 nTunneledPort,
-    OMX_INOUT  OMX_TUNNELSETUPTYPE* pTunnelSetup)
-{
-    /*
-     * Todo
-     */
-
-    return OMX_ErrorNotImplemented;
-}
-
 OMX_ERRORTYPE ComponentBase::UseBuffer(
     OMX_IN OMX_HANDLETYPE hComponent,
     OMX_INOUT OMX_BUFFERHEADERTYPE **ppBufferHdr,
@@ -1167,67 +1092,6 @@ OMX_ERRORTYPE ComponentBase::CBaseSetCallbacks(
     callbacks = pCallbacks;
 
     return OMX_ErrorNone;
-}
-
-OMX_ERRORTYPE ComponentBase::ComponentDeInit(
-    OMX_IN  OMX_HANDLETYPE hComponent)
-{
-    ComponentBase *cbase;
-
-    if (!hComponent)
-        return OMX_ErrorBadParameter;
-
-    cbase = static_cast<ComponentBase *>
-        (((OMX_COMPONENTTYPE *)hComponent)->pComponentPrivate);
-    if (!cbase)
-        return OMX_ErrorBadParameter;
-
-    return cbase->CBaseComponentDeInit(hComponent);
-}
-
-OMX_ERRORTYPE ComponentBase::CBaseComponentDeInit(
-    OMX_IN  OMX_HANDLETYPE hComponent)
-{
-    /*
-     * Todo
-     */
-
-    return OMX_ErrorNotImplemented;
-}
-
-OMX_ERRORTYPE ComponentBase::UseEGLImage(
-    OMX_IN OMX_HANDLETYPE hComponent,
-    OMX_INOUT OMX_BUFFERHEADERTYPE** ppBufferHdr,
-    OMX_IN OMX_U32 nPortIndex,
-    OMX_IN OMX_PTR pAppPrivate,
-    OMX_IN void* eglImage)
-{
-    ComponentBase *cbase;
-
-    if (!hComponent)
-        return OMX_ErrorBadParameter;
-
-    cbase = static_cast<ComponentBase *>
-        (((OMX_COMPONENTTYPE *)hComponent)->pComponentPrivate);
-    if (!cbase)
-        return OMX_ErrorBadParameter;
-
-    return cbase->CBaseUseEGLImage(hComponent, ppBufferHdr, nPortIndex,
-                                   pAppPrivate, eglImage);
-}
-
-OMX_ERRORTYPE ComponentBase::CBaseUseEGLImage(
-    OMX_IN OMX_HANDLETYPE hComponent,
-    OMX_INOUT OMX_BUFFERHEADERTYPE** ppBufferHdr,
-    OMX_IN OMX_U32 nPortIndex,
-    OMX_IN OMX_PTR pAppPrivate,
-    OMX_IN void* eglImage)
-{
-    /*
-     * Todo
-     */
-
-    return OMX_ErrorNotImplemented;
 }
 
 OMX_ERRORTYPE ComponentBase::ComponentRoleEnum(
@@ -2160,7 +2024,6 @@ OMX_ERRORTYPE ComponentBase::ProcessorPreFreeBuffer(OMX_U32 nPortIndex, OMX_BUFF
     return OMX_ErrorNone;
 
 }
-
 /* end of processor callbacks */
 
 /* helper for derived class */
@@ -2173,7 +2036,7 @@ const OMX_COMPONENTTYPE *ComponentBase::GetComponentHandle(void)
 {
     return handle;
 }
-
+#if 0
 void ComponentBase::DumpBuffer(const OMX_BUFFERHEADERTYPE *bufferheader,
                                bool dumpdata)
 {
@@ -2227,7 +2090,7 @@ void ComponentBase::DumpBuffer(const OMX_BUFFERHEADERTYPE *bufferheader,
         LOGD("%s", pp);
     }
 }
-
+#endif
 /* end of component methods & helpers */
 
 /*

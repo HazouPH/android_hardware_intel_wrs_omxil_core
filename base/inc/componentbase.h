@@ -114,18 +114,6 @@ public:
     /*
      * component methods & helpers
      */
-    static OMX_ERRORTYPE GetComponentVersion(
-        OMX_IN  OMX_HANDLETYPE hComponent,
-        OMX_OUT OMX_STRING pComponentName,
-        OMX_OUT OMX_VERSIONTYPE* pComponentVersion,
-        OMX_OUT OMX_VERSIONTYPE* pSpecVersion,
-        OMX_OUT OMX_UUIDTYPE* pComponentUUID);
-    OMX_ERRORTYPE CBaseGetComponentVersion(
-        OMX_IN  OMX_HANDLETYPE hComponent,
-        OMX_OUT OMX_STRING pComponentName,
-        OMX_OUT OMX_VERSIONTYPE* pComponentVersion,
-        OMX_OUT OMX_VERSIONTYPE* pSpecVersion,
-        OMX_OUT OMX_UUIDTYPE* pComponentUUID);
 
     static OMX_ERRORTYPE SendCommand(
         OMX_IN  OMX_HANDLETYPE hComponent,
@@ -190,19 +178,6 @@ public:
         OMX_IN  OMX_HANDLETYPE hComponent,
         OMX_OUT OMX_STATETYPE* pState);
 
-    static OMX_ERRORTYPE ComponentTunnelRequest(
-        OMX_IN  OMX_HANDLETYPE hComp,
-        OMX_IN  OMX_U32 nPort,
-        OMX_IN  OMX_HANDLETYPE hTunneledComp,
-        OMX_IN  OMX_U32 nTunneledPort,
-        OMX_INOUT  OMX_TUNNELSETUPTYPE* pTunnelSetup);
-    OMX_ERRORTYPE CBaseComponentTunnelRequest(
-        OMX_IN  OMX_HANDLETYPE hComp,
-        OMX_IN  OMX_U32 nPort,
-        OMX_IN  OMX_HANDLETYPE hTunneledComp,
-        OMX_IN  OMX_U32 nTunneledPort,
-        OMX_INOUT  OMX_TUNNELSETUPTYPE* pTunnelSetup);
-
     static OMX_ERRORTYPE UseBuffer(
         OMX_IN OMX_HANDLETYPE hComponent,
         OMX_INOUT OMX_BUFFERHEADERTYPE** ppBufferHdr,
@@ -263,24 +238,6 @@ public:
         OMX_IN  OMX_CALLBACKTYPE* pCallbacks,
         OMX_IN  OMX_PTR pAppData);
 
-    static OMX_ERRORTYPE ComponentDeInit(
-        OMX_IN  OMX_HANDLETYPE hComponent);
-    OMX_ERRORTYPE CBaseComponentDeInit(
-        OMX_IN  OMX_HANDLETYPE hComponent);
-
-    static OMX_ERRORTYPE UseEGLImage(
-        OMX_IN OMX_HANDLETYPE hComponent,
-        OMX_INOUT OMX_BUFFERHEADERTYPE** ppBufferHdr,
-        OMX_IN OMX_U32 nPortIndex,
-        OMX_IN OMX_PTR pAppPrivate,
-        OMX_IN void* eglImage);
-    OMX_ERRORTYPE CBaseUseEGLImage(
-        OMX_IN OMX_HANDLETYPE hComponent,
-        OMX_INOUT OMX_BUFFERHEADERTYPE** ppBufferHdr,
-        OMX_IN OMX_U32 nPortIndex,
-        OMX_IN OMX_PTR pAppPrivate,
-        OMX_IN void* eglImage);
-
     static OMX_ERRORTYPE ComponentRoleEnum(
         OMX_IN OMX_HANDLETYPE hComponent,
         OMX_OUT OMX_U8 *cRole,
@@ -312,9 +269,9 @@ public:
 protected:
     /* helpers for derived class */
     const OMX_COMPONENTTYPE *GetComponentHandle(void);
-
+#if 0
     void DumpBuffer(const OMX_BUFFERHEADERTYPE *bufferheader, bool dumpdata);
-
+#endif
     /* check if all port has own pending buffer */
     virtual bool IsAllBufferAvailable(void);
 
