@@ -146,12 +146,11 @@ struct module *module_open(const char *file, int flag)
     new->ref_count = 1;
     new->priv = NULL;
     new->next = NULL;
+    new->handle = NULL;
 
-    dlerror();
     new->handle = dlopen(file, flag);
-    dlerr = dlerror();
-    if (dlerr) {
-        LOGE("dlopen failed (%s)\n", dlerr);
+    if (!(new->handle)) {
+        LOGE("dlopen failed (%s)\n", file);
         module_set_error(dlerr);
         pthread_mutex_unlock(&g_lock);
         goto free_new;
