@@ -572,7 +572,10 @@ OMX_ERRORTYPE ComponentBase::CBaseSetParameter(
                 return OMX_ErrorIncorrectStateOperation;
         }
 
-        port->SetPortDefinition(p, false);
+        ret = port->SetPortDefinition(p, false);
+        if (ret != OMX_ErrorNone) {
+            return ret;
+        }
         break;
     }
     case OMX_IndexParamCompBufferSupplier:

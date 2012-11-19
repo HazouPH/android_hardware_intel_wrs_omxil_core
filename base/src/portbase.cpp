@@ -199,6 +199,15 @@ OMX_ERRORTYPE PortBase::SetPortDefinition(
                 return OMX_ErrorBadParameter;
             temp.nBufferCountActual = p->nBufferCountActual;
         }
+        if ((p->nBufferSize > temp.nBufferSize) && (temp.eDir == OMX_DirInput)) {
+            if (p->nBufferSize <= MAX_INPUT_PORT_SIZE) {
+                LOGW("Input port size has been changed!");
+                temp.nBufferSize = p->nBufferSize;
+            } else {
+                LOGE("Invalid input port size!");
+                return OMX_ErrorBadParameter;
+            }
+        }
     }
     else {
         temp.nPortIndex = p->nPortIndex;

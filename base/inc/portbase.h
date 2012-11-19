@@ -187,6 +187,12 @@ private:
 
     /* wrs component handle */
     class ComponentBase *cbase;
+
+    /* Input port size limit. The limit is set to be the size of a 1080P 4:4:4 raw image size,
+       which is 1920x1080x3. */
+    enum {
+        MAX_INPUT_PORT_SIZE = 6220800
+    };
 };
 
 /* end of PortBase */
