@@ -68,6 +68,7 @@ typedef enum OMX_VIDEO_CODINGTYPE {
     OMX_VIDEO_CodingRV,         /**< all versions of Real Video */
     OMX_VIDEO_CodingAVC,        /**< H.264/AVC */
     OMX_VIDEO_CodingMJPEG,      /**< Motion JPEG */
+    OMX_VIDEO_CodingVPX,        /**< Google VPX, formerly known as On2 VP8 */
     OMX_VIDEO_CodingKhronosExtensions = 0x6F000000, /**< Reserved region for introducing Khronos Standard Extensions */
     OMX_VIDEO_CodingVendorStartUnused = 0x7F000000, /**< Reserved region for introducing Vendor Extensions */
     OMX_VIDEO_CodingMax = 0x7FFFFFFF
@@ -758,6 +759,32 @@ typedef struct OMX_VIDEO_PARAM_RVTYPE {
     OMX_BOOL bEnableLatencyMode;
 } OMX_VIDEO_PARAM_RVTYPE;
 
+typedef enum OMX_VIDEO_VP8PROFILETYPE {
+    OMX_VIDEO_VP8ProfileMain = 0,   /**< VP8 Main profile */
+    OMX_VIDEO_VP8ProfileKhronosExtensions = 0x6F000000, /**< Reserved region for introducing Khronos Standard Extensions */
+    OMX_VIDEO_VP8ProfileVendorStartUnused = 0x7F000000, /**< Reserved region for introducing Vendor Extensions */
+    OMX_VIDEO_VP8ProfileMax = 0x7FFFFFFF
+} OMX_VIDEO_VP8PROFILETYPE;
+
+typedef enum OMX_VIDEO_VP8LEVELTYPE {
+    OMX_VIDEO_VP8Level_Version0 = 0,   /**< VP8 Level "Version 0" */
+    OMX_VIDEO_VP8Level_Version1,       /**< VP8 Level "Version 1" */
+    OMX_VIDEO_VP8Level_Version2,       /**< VP8 Level "Version 2" */
+    OMX_VIDEO_VP8Level_Version3,       /**< VP8 Level "Version 3" */
+    OMX_VIDEO_VP8LevelKhronosExtensions = 0x6F000000, /**< Reserved region for introducing Khronos Standard Extensions */
+    OMX_VIDEO_VP8LevelVendorStartUnused = 0x7F000000, /**< Reserved region for introducing Vendor Extensions */
+    OMX_VIDEO_VP8LevelMax = 0x7FFFFFFF
+} OMX_VIDEO_VP8LEVELTYPE;
+
+typedef struct OMX_VIDEO_PARAM_VP8TYPE {
+    OMX_U32 nSize;
+    OMX_VERSIONTYPE nVersion;
+    OMX_U32 nPortIndex;
+    OMX_VIDEO_VP8PROFILETYPE eProfile;
+    OMX_VIDEO_VP8LEVELTYPE eLevel;
+    OMX_U32 nDCTPartitions;
+    OMX_BOOL bErrorResilientMode;
+} OMX_VIDEO_PARAM_VP8TYPE;
 
 /**
  * AVC profile types, each profile indicates support for various
