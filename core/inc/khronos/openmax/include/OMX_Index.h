@@ -179,6 +179,7 @@ typedef enum OMX_INDEXTYPE {
     OMX_IndexParamVideoSliceFMO,            /**< reference: OMX_VIDEO_PARAM_AVCSLICEFMO */
     OMX_IndexConfigVideoAVCIntraPeriod,     /**< reference: OMX_VIDEO_CONFIG_AVCINTRAPERIOD */
     OMX_IndexConfigVideoNalSize,            /**< reference: OMX_VIDEO_CONFIG_NALSIZE */
+    OMX_IndexConfigVideoVp8ReferenceFrame,  /**< reference: OMX_VIDEO_VP8REFERENCEFRAMETYPE */
 
     /* Image & Video common Configurations */
     OMX_IndexCommonStartUnused = 0x07000000,

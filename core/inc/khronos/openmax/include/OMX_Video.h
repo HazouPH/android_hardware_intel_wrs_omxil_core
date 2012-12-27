@@ -786,6 +786,18 @@ typedef struct OMX_VIDEO_PARAM_VP8TYPE {
     OMX_BOOL bErrorResilientMode;
 } OMX_VIDEO_PARAM_VP8TYPE;
 
+typedef struct OMX_VIDEO_VP8REFERENCEFRAMETYPE {
+	OMX_U32 nSize;
+	OMX_VERSIONTYPE nVersion;
+	OMX_U32 nPortIndex;
+	OMX_BOOL bPreviousFrameRefresh;
+	OMX_BOOL bGoldenFrameRefresh;
+	OMX_BOOL bAlternateFrameRefresh;
+	OMX_BOOL bUsePreviousFrame;
+	OMX_BOOL bUseGoldenFrame;
+	OMX_BOOL bUseAlternateFrame;
+} OMX_VIDEO_VP8REFERENCEFRAMETYPE ;
+
 /**
  * AVC profile types, each profile indicates support for various
  * performance bounds and different annexes.
