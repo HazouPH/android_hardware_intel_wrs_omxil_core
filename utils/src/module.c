@@ -167,10 +167,15 @@ struct module *module_open(const char *file, int flag)
         return existing;
     }
 
+    new->name = strdup(file);
+    if (!new->name) {
+        goto free_handle;
+    }
+
     dlerror();
     new->init = dlsym(new->handle, "module_init");
     dlerr = dlerror();
-    if (!dlerr) {
+    if (!dlerr && new->init) {
         LOGE("module %s has init(), call the symbol\n", new->name);
         init_ret = new->init(new);
     }
@@ -186,13 +191,6 @@ struct module *module_open(const char *file, int flag)
     dlerr = dlerror();
     if (dlerr)
         new->exit = NULL;
-
-    new->name = strdup(file);
-    if (!new->name) {
-        if (new->exit)
-            new->exit(new);
-        goto free_handle;
-    }
 
     g_module_head = module_add_list(g_module_head, new);
 

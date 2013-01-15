@@ -1730,7 +1730,7 @@ OMX_ERRORTYPE ComponentBase::AllocatePorts(void)
 free_ports:
     LOGE("%s(): exit, unknown component variant\n", __func__);
     FreePorts();
-    return ret;
+    return OMX_ErrorUndefined;
 }
 
 /* called int FreeHandle() */
@@ -1767,6 +1767,10 @@ void ComponentBase::Work(void)
     buffer_retain_t retain[nr_ports];
     OMX_U32 i;
     OMX_ERRORTYPE ret;
+
+    if (nr_ports == 0) {
+        return;
+    }
 
     pthread_mutex_lock(&ports_block);
 

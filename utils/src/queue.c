@@ -78,6 +78,9 @@ int queue_push_head(struct queue *queue, void *data)
 
 void __queue_push_tail(struct queue *queue, struct list *entry)
 {
+        if (!entry) {
+            return ;
+        }
 	queue->tail = list_add_tail(queue->tail, entry);
 	if (queue->tail->next)
 		queue->tail = queue->tail->next;
