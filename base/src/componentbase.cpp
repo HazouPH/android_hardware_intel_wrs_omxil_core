@@ -1232,6 +1232,7 @@ static inline const char *GetStateName(OMX_STATETYPE state)
 void ComponentBase::TransState(OMX_STATETYPE transition)
 {
     OMX_STATETYPE current = this->state;
+    OMX_STATETYPE dest = this->state;
     OMX_EVENTTYPE event;
     OMX_U32 data1, data2;
     OMX_ERRORTYPE ret;
@@ -1277,7 +1278,7 @@ notify_event:
         data1 = OMX_CommandStateSet;
         data2 = transition;
 
-        state = transition;
+        dest = transition;
         LOGD("%s:%s: transition from %s to %s completed",
              GetName(), GetWorkingRole(),
              GetStateName(current), GetStateName(transition));
@@ -1288,7 +1289,7 @@ notify_event:
         data2 = 0;
 
         if (transition == OMX_StateInvalid || ret == OMX_ErrorInvalidState) {
-            state = OMX_StateInvalid;
+            dest = OMX_StateInvalid;
             LOGE("%s:%s: exit failure, transition from %s to %s, "
                  "current state is %s\n",
                  GetName(), GetWorkingRole(), GetStateName(current),
@@ -1302,6 +1303,7 @@ notify_event:
     if (ret == OMX_ErrorNone && transition == OMX_StateWaitForResources)
         callbacks->EventHandler(handle, appdata,
                                 OMX_EventResourcesAcquired, 0, 0, NULL);
+    state = dest;
 }
 
 inline OMX_ERRORTYPE ComponentBase::TransStateToLoaded(OMX_STATETYPE current)
