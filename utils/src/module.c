@@ -131,7 +131,7 @@ struct module *module_open(const char *file, int flag)
 
     existing = module_find_with_name(g_module_head, file);
     if (existing) {
-        LOGE("found opened module %s\n", existing->name);
+        LOGE("found opened module %s with name\n", existing->name);
         existing->ref_count++;
         pthread_mutex_unlock(&g_lock);
         return existing;
@@ -153,13 +153,12 @@ struct module *module_open(const char *file, int flag)
         LOGE("dlopen failed (%s)\n", file);
         dlerr = dlerror();
         module_set_error(dlerr);
-        pthread_mutex_unlock(&g_lock);
         goto free_new;
     }
 
     existing = module_find_with_handle(g_module_head, new->handle);
     if (existing) {
-        LOGE("found opened module %s\n", existing->name);
+        LOGE("found opened module %s with handle\n", existing->name);
         existing->ref_count++;
 
         free(new);
@@ -182,7 +181,6 @@ struct module *module_open(const char *file, int flag)
 
     if (init_ret) {
         LOGE("module %s init() failed (%d)\n", new->name, init_ret);
-        pthread_mutex_unlock(&g_lock);
         goto free_handle;
     }
 
@@ -226,12 +224,8 @@ int module_close(struct module *module)
         if (module->exit)
             module->exit(module);
 
-        dlerror();
-        dlclose(module->handle);
-        dlerr = dlerror();
-        if (dlerr) {
-            module_set_error(dlerr);
-            ret = -1;
+        if (dlclose(module->handle)) {
+            LOGE("module %s dlclose failed",module->name);
         }
 
         g_module_head = module_del_list(g_module_head, module);

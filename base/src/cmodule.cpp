@@ -90,6 +90,8 @@ OMX_ERRORTYPE CModule::Load(int flag)
         return OMX_ErrorInvalidComponent;
     }
 
+    if (module)
+        LOGE("module %s will be overwrite",module->name);
     module = m;
     LOGI("module %s successfully loaded\n", lname);
 
