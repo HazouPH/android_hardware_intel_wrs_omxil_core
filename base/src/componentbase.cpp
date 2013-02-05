@@ -1357,17 +1357,16 @@ inline OMX_ERRORTYPE ComponentBase::TransStateToIdle(OMX_STATETYPE current)
 
     if (current == OMX_StateLoaded) {
         OMX_U32 i;
+        for (i = 0; i < nr_ports; i++) {
+             if (ports[i]->IsEnabled())
+                 ports[i]->WaitPortBufferCompletion();
+        }
 
         ret = ProcessorInit();
         if (ret != OMX_ErrorNone) {
             LOGE("%s:%s: ProcessorInit() failed (ret : 0x%08x)\n",
                  GetName(), GetWorkingRole(), ret);
             goto out;
-        }
-
-        for (i = 0; i < nr_ports; i++) {
-            if (ports[i]->IsEnabled())
-                ports[i]->WaitPortBufferCompletion();
         }
     }
     else if ((current == OMX_StatePause) || (current == OMX_StateExecuting)) {
@@ -1614,9 +1613,9 @@ void ComponentBase::TransStatePort(OMX_U32 port_index, OMX_U8 state)
             if (state == PortBase::OMX_PortEnabled) {
                 data1 = OMX_CommandPortEnable;
                 ProcessorReset();
-            }
-            else
+            } else {
                 data1 = OMX_CommandPortDisable;
+            }
             data2 = i;
         }
         else {
