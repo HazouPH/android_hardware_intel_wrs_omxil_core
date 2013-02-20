@@ -432,6 +432,9 @@ private:
     /* component name */
     char name[OMX_MAX_STRINGNAME_SIZE];
 
+    /* state lock */
+    pthread_mutex_t state_block;
+
     /* omx specification version */
 #ifndef ANDROID
     const static OMX_U8 OMX_SPEC_VERSION_MAJOR = 1;
