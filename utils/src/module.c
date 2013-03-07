@@ -242,7 +242,7 @@ int module_close(struct module *module)
 
 void *module_symbol(struct module *module, const char *string)
 {
-    void *symbol;
+    void *symbol = NULL;
     const char *dlerr;
 
     if (!module || !module->handle || !string)
@@ -250,10 +250,9 @@ void *module_symbol(struct module *module, const char *string)
 
     pthread_mutex_lock(&g_lock);
 
-    dlerror();
     symbol = dlsym(module->handle, string);
-    dlerr = dlerror();
-    if (dlerr) {
+    if (!symbol) {
+        dlerr = dlerror();
         LOGE("not founded symbol %s in module %s (%s)\n",
              string, module->name, dlerr);
         module_set_error(dlerr);
