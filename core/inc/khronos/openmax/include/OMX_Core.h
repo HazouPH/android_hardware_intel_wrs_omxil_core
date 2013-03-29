@@ -392,7 +392,9 @@ typedef struct OMX_PARAM_COMPONENTROLETYPE {
  */
 #define OMX_BUFFERFLAG_CODECCONFIG 0x00000080
 
-
+#ifdef BUFFERFLAG_EXT
+#define OMX_BUFFERFLAG_FIELD 0x00010000
+#endif
 
 /** @ingroup buf */
 typedef struct OMX_BUFFERHEADERTYPE
