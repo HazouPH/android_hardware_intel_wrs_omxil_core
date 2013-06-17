@@ -28,7 +28,8 @@ endif
 LOCAL_C_INCLUDES := \
 	$(WRS_OMXIL_CORE_ROOT)/utils/inc \
 	$(WRS_OMXIL_CORE_ROOT)/base/inc \
-	$(WRS_OMXIL_CORE_ROOT)/core/inc/khronos/openmax/include
+	$(WRS_OMXIL_CORE_ROOT)/core/inc/khronos/openmax/include \
+        $(TOP)/frameworks/native/include/media/openmax
 
 include $(BUILD_STATIC_LIBRARY)
 

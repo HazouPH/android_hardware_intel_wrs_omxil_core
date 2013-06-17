@@ -21,7 +21,7 @@
 
 #include <OMX_Core.h>
 #include <OMX_Component.h>
-
+#include <OMX_IntelVideoExt.h>
 #include <portbase.h>
 
 class PortVideo : public PortBase

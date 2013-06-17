@@ -27,8 +27,8 @@
  * access video items.
  */
 
-#ifndef OMX_VideoExt_h
-#define OMX_VideoExt_h
+#ifndef OMX_IntelVideoExt_h
+#define OMX_IntelVideoExt_h
 
 #ifdef __cplusplus
 extern "C" {
@@ -39,28 +39,13 @@ extern "C" {
  * for this header file to compile successfully
  */
 #include <OMX_Core.h>
-
 /** NALU Formats */
-typedef enum OMX_NALUFORMATSTYPE {
-    OMX_NaluFormatStartCodes = 1,
-    OMX_NaluFormatOneNaluPerBuffer = 2,
-    OMX_NaluFormatOneByteInterleaveLength = 4,
-    OMX_NaluFormatTwoByteInterleaveLength = 8,
-    OMX_NaluFormatFourByteInterleaveLength = 16,
+typedef enum OMX_INTEL_NALUFORMATSTYPE {
     OMX_NaluFormatZeroByteInterleaveLength = 32,
     OMX_NaluFormatStartCodesSeparateFirstHeader = 64,
     OMX_NaluFormatLengthPrefixedSeparateFirstHeader = 128,
-    OMX_NaluFormatCodingMax = 0x7FFFFFFF
-} OMX_NALUFORMATSTYPE;
+} OMX_INTEL_NALUFORMATSTYPE;
 
-
-/** NAL Stream Format */
-typedef struct OMX_NALSTREAMFORMATTYPE{
-    OMX_U32 nSize;
-    OMX_VERSIONTYPE nVersion;
-    OMX_U32 nPortIndex;
-    OMX_NALUFORMATSTYPE eNaluFormat;
-} OMX_NALSTREAMFORMATTYPE;
 
 typedef struct OMX_VIDEO_PARAM_BYTESTREAMTYPE {
      OMX_U32 nSize;                 // Size of the structure
@@ -144,6 +129,24 @@ typedef struct OMX_VIDEO_PARAM_INTEL_ADAPTIVE_SLICE_CONTROL {
      OMX_U32 nSliceSizeThreshold;         // Slice size threshold for adaptive slice control to start a new slice
      OMX_U32 nSliceSizeSkipThreshold;     // Slice size skip threshold for adaptive slice control to start a new slice
 } OMX_VIDEO_PARAM_INTEL_ADAPTIVE_SLICE_CONTROL;
+
+/**
+ * Vendor Private Configs
+ *
+ * STRUCT MEMBERS:
+ *  nSize      : Size of the structure in bytes
+ *  nVersion   : OMX specification version information
+ *  nPortIndex : Port that this structure applies to
+ *  nCapacity  : Specifies the private unit size
+ *  nHolder    : Pointer to private unit address 
+ */
+typedef struct OMX_VIDEO_CONFIG_PRI_INFOTYPE {
+    OMX_U32 nSize;
+    OMX_VERSIONTYPE nVersion;
+    OMX_U32 nPortIndex;
+    OMX_U32 nCapacity;
+    OMX_PTR nHolder;
+} OMX_VIDEO_CONFIG_PRI_INFOTYPE;
 
 #ifdef __cplusplus
 }

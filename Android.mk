@@ -4,20 +4,12 @@ LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 LOCAL_COPY_HEADERS_TO := khronos/openmax
+
 LOCAL_COPY_HEADERS := \
-    core/inc/khronos/openmax/include/OMX_Audio.h \
-    core/inc/khronos/openmax/include/OMX_Component.h \
-    core/inc/khronos/openmax/include/OMX_ContentPipe.h \
-    core/inc/khronos/openmax/include/OMX_Core.h \
-    core/inc/khronos/openmax/include/OMX_IVCommon.h \
-    core/inc/khronos/openmax/include/OMX_Image.h \
-    core/inc/khronos/openmax/include/OMX_Index.h \
-    core/inc/khronos/openmax/include/OMX_IndexExt.h \
     core/inc/khronos/openmax/include/OMX_IntelErrorTypes.h \
-    core/inc/khronos/openmax/include/OMX_Other.h \
-    core/inc/khronos/openmax/include/OMX_Types.h \
-    core/inc/khronos/openmax/include/OMX_Video.h \
-    core/inc/khronos/openmax/include/OMX_VideoExt.h
+    core/inc/khronos/openmax/include/OMX_IntelIndexExt.h \
+    core/inc/khronos/openmax/include/OMX_IntelVideoExt.h
+
 include $(BUILD_COPY_HEADERS)
 
 include $(CLEAR_VARS)

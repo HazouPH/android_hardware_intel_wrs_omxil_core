@@ -23,6 +23,7 @@ LOCAL_C_INCLUDES := \
 	$(WRS_OMXIL_CORE_ROOT)/utils/inc \
 	$(WRS_OMXIL_CORE_ROOT)/base/inc \
 	$(WRS_OMXIL_CORE_ROOT)/core/inc/khronos/openmax/include \
+        $(TOP)/frameworks/native/include/media/openmax \
 	$(PV_INCLUDES)
 
 include $(BUILD_SHARED_LIBRARY)

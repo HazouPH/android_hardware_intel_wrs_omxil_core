@@ -24,7 +24,7 @@
 
 #include <portbase.h>
 #include <componentbase.h>
-
+#include <OMX_VideoExt.h>
 //#define LOG_NDEBUG 0
 
 #define LOG_TAG "portbase"

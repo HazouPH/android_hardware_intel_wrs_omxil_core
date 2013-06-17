@@ -26,8 +26,8 @@
  * for both applications and components .
  */
 
-#ifndef OMX_IndexExt_h
-#define OMX_IndexExt_h
+#ifndef OMX_IntelIndexExt_h
+#define OMX_IntelIndexExt_h
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,28 +44,8 @@ extern "C" {
 
 This enum lists the current Khronos extension indices to OpenMAX IL.
 */
-typedef enum OMX_INDEXEXTTYPE {
-
-    /* Component parameters and configurations */
-    OMX_IndexExtComponentStartUnused = OMX_IndexKhronosExtensions + 0x00100000,
-    OMX_IndexConfigCallbackRequest,                 /**< reference: OMX_CONFIG_CALLBACKREQUESTTYPE */
-    OMX_IndexConfigCommitMode,                      /**< reference: OMX_CONFIG_COMMITMODETYPE */
-    OMX_IndexConfigCommit,                          /**< reference: OMX_CONFIG_COMMITTYPE */
-
-    /* Port parameters and configurations */
-    OMX_IndexExtPortStartUnused = OMX_IndexKhronosExtensions + 0x00200000,
-
-    /* Audio parameters and configurations */
-    OMX_IndexExtAudioStartUnused = OMX_IndexKhronosExtensions + 0x00400000,
-
-    /* Image parameters and configurations */
-    OMX_IndexExtImageStartUnused = OMX_IndexKhronosExtensions + 0x00500000,
-
-    /* Video parameters and configurations */
-    OMX_IndexExtVideoStartUnused = OMX_IndexKhronosExtensions + 0x00600000,
-    OMX_IndexParamNalStreamFormatSupported,         /**< reference: OMX_NALSTREAMFORMATTYPE */
-    OMX_IndexParamNalStreamFormat,                  /**< reference: OMX_NALSTREAMFORMATTYPE */
-    OMX_IndexParamNalStreamFormatSelect,            /**< reference: OMX_NALSTREAMFORMATTYPE */
+typedef enum OMX_INTELINDEXEXTTYPE {
+    OMX_IndexIntelStartUsed = OMX_IndexVendorStartUnused + 1, 
     OMX_IndexParamVideoBytestream,                  /**< reference: OMX_VIDEO_PARAM_BYTESTREAMTYPE */
     OMX_IndexParamIntelBitrate,                     /**< reference: OMX_VIDEO_PARAM_INTEL_BITRATETYPE */
     OMX_IndexConfigIntelBitrate,                    /**< reference: OMX_VIDEO_CONFIG_INTEL_BITRATETYPE */
@@ -75,24 +55,14 @@ typedef enum OMX_INDEXEXTTYPE {
     OMX_IndexParamIntelAVCVUI,                      /**< reference: OMX_VIDEO_PARAM_INTEL_AVCVUI */
     OMX_IndexParamIntelAdaptiveSliceControl,        /**< reference: OMX_VIDEO_PARAM_INTEL_ADAPTIVE_SLICE_CONTROL */
     OMX_IndexStoreMetaDataInBuffers,                /**< reference: StoreMetaDataInBuffersParams*/
-
-    /* Image & Video common configurations */
-    OMX_IndexExtCommonStartUnused = OMX_IndexKhronosExtensions + 0x00700000,
-
-    /* Other configurations */
-    OMX_IndexExtOtherStartUnused = OMX_IndexKhronosExtensions + 0x00800000,
-
-    /* Time configurations */
-    OMX_IndexExtTimeStartUnused = OMX_IndexKhronosExtensions + 0x00900000,
-
+    OMX_IndexIntelPrivateInfo,
     /* NativeWindow configurations */
-    OMX_IndexForNativeWindow = OMX_IndexKhronosExtensions + 0x00a00000,
     OMX_IndexExtEnableNativeBuffer,                 /**<reference: EnableNativeBuffer */
     OMX_IndexExtGetNativeBufferUsage,               /**<reference: GetNativeBufferUsage  */
     OMX_IndexExtUseNativeBuffer,                    /**<reference: UseNativeBuffer  */
     OMX_IndexExtRotationDegrees,                    /**<reference: Rotation for decode*/
-    OMX_IndexExtMax = 0x7FFFFFFF
-} OMX_INDEXEXTTYPE;
+    OMX_IntelIndexExtMax = 0x7FFFFFFF
+} OMX_INTELINDEXEXTTYPE;
 
 #ifdef __cplusplus
 }
