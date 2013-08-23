@@ -745,8 +745,14 @@ OMX_ERRORTYPE ComponentBase::CBaseGetExtensionIndex(
         *pIndexType = static_cast<OMX_INDEXTYPE>(OMX_IndexExtUseNativeBuffer);
         return OMX_ErrorNone;
     }
+
     if (!strcmp(cParameterName, "OMX.Intel.index.rotation")) {
         *pIndexType = static_cast<OMX_INDEXTYPE>(OMX_IndexExtRotationDegrees);
+        return OMX_ErrorNone;
+    }
+
+    if (!strcmp(cParameterName, "OMX.Intel.index.enableSyncEncoding")) {
+        *pIndexType = static_cast<OMX_INDEXTYPE>(OMX_IndexExtSyncEncoding);
         return OMX_ErrorNone;
     }
 

@@ -61,6 +61,7 @@ typedef enum OMX_INTELINDEXEXTTYPE {
     OMX_IndexExtGetNativeBufferUsage,               /**<reference: GetNativeBufferUsage  */
     OMX_IndexExtUseNativeBuffer,                    /**<reference: UseNativeBuffer  */
     OMX_IndexExtRotationDegrees,                    /**<reference: Rotation for decode*/
+    OMX_IndexExtSyncEncoding,                       /**<reference: Sync mode for encode*/
     OMX_IntelIndexExtMax = 0x7FFFFFFF
 } OMX_INTELINDEXEXTTYPE;
 
