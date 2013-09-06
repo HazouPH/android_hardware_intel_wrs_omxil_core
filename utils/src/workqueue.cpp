@@ -50,6 +50,9 @@ int WorkQueue::StartWork(bool executing)
 {
     this->executing = executing;
 
+    pthread_mutex_lock(&wlock);
+    stop = false;
+    pthread_mutex_unlock(&wlock);
     return Start();
 }
 
