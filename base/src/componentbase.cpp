@@ -756,6 +756,11 @@ OMX_ERRORTYPE ComponentBase::CBaseGetExtensionIndex(
         return OMX_ErrorNone;
     }
 
+    if (!strcmp(cParameterName, "OMX.google.android.index.prependSPSPPSToIDRFrames")) {
+        *pIndexType = static_cast<OMX_INDEXTYPE>(OMX_IndexExtPrependSPSPPS);
+        return OMX_ErrorNone;
+    }
+
     return OMX_ErrorUnsupportedIndex;
 }
 
