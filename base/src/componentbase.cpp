@@ -767,6 +767,11 @@ OMX_ERRORTYPE ComponentBase::CBaseGetExtensionIndex(
         return OMX_ErrorNone;
     }
 #endif
+    
+	if (!strcmp(cParameterName, "OMX.Intel.index.enableErrorReport")) {
+        *pIndexType = static_cast<OMX_INDEXTYPE>(OMX_IndexExtEnableErrorReport);
+        return OMX_ErrorNone;
+    }
 
     return OMX_ErrorUnsupportedIndex;
 }

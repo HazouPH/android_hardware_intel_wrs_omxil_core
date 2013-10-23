@@ -66,6 +66,8 @@ typedef enum OMX_INTELINDEXEXTTYPE {
 #ifdef TARGET_HAS_VPP
     OMX_IndexExtVppBufferNum,                       /**<reference: vpp buffer number*/
 #endif
+    /* Error report by WebRTC */
+    OMX_IndexExtEnableErrorReport,                  /**<reference: EnableErrorReport for decoder */
     OMX_IntelIndexExtMax = 0x7FFFFFFF
 } OMX_INTELINDEXEXTTYPE;
 
