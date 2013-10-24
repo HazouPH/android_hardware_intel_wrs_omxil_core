@@ -1,6 +1,10 @@
 LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 
+ifeq ($(TARGET_HAS_VPP),true)
+LOCAL_CFLAGS += -DTARGET_HAS_VPP
+endif
+
 LOCAL_SRC_FILES := \
 	cmodule.cpp \
 	componentbase.cpp \

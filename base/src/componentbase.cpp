@@ -761,6 +761,13 @@ OMX_ERRORTYPE ComponentBase::CBaseGetExtensionIndex(
         return OMX_ErrorNone;
     }
 
+#ifdef TARGET_HAS_VPP
+    if (!strcmp(cParameterName, "OMX.Intel.index.vppBufferNum")) {
+        *pIndexType = static_cast<OMX_INDEXTYPE>(OMX_IndexExtVppBufferNum);
+        return OMX_ErrorNone;
+    }
+#endif
+
     return OMX_ErrorUnsupportedIndex;
 }
 

@@ -63,6 +63,9 @@ typedef enum OMX_INTELINDEXEXTTYPE {
     OMX_IndexExtRotationDegrees,                    /**<reference: Rotation for decode*/
     OMX_IndexExtSyncEncoding,                       /**<reference: Sync mode for encode*/
     OMX_IndexExtPrependSPSPPS,
+#ifdef TARGET_HAS_VPP
+    OMX_IndexExtVppBufferNum,                       /**<reference: vpp buffer number*/
+#endif
     OMX_IntelIndexExtMax = 0x7FFFFFFF
 } OMX_INTELINDEXEXTTYPE;
 
