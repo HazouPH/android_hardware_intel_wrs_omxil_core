@@ -1004,9 +1004,6 @@ OMX_ERRORTYPE ComponentBase::CBaseEmptyThisBuffer(
     if (!port)
         return OMX_ErrorBadParameter;
 
-    if (pBuffer->pInputPortPrivate != port)
-        return OMX_ErrorBadParameter;
-
     if (port->IsEnabled()) {
         if (state != OMX_StateIdle && state != OMX_StateExecuting &&
             state != OMX_StatePause)
