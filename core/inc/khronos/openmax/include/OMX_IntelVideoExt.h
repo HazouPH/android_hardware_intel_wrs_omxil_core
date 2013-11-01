@@ -148,6 +148,29 @@ typedef struct OMX_VIDEO_CONFIG_PRI_INFOTYPE {
     OMX_PTR nHolder;
 } OMX_VIDEO_CONFIG_PRI_INFOTYPE;
 
+// Error reporting data structure
+#define MAX_ERR_NUM 10
+
+typedef enum
+{
+    OMX_Decode_SliceMissing  = 0,
+    OMX_Decode_MBError       = 1,
+    OMX_Decode_RefMissing    = 2,
+} OMX_VIDEO_DECODE_ERRORTYPE;
+
+typedef struct OMX_VIDEO_ERROR_INFO {
+    OMX_VIDEO_DECODE_ERRORTYPE type;
+    union {
+        typedef struct {OMX_U32 start_mb; OMX_U32 end_mb;} mb_pos;
+    } error_data;
+};
+
+typedef struct OMX_VIDEO_ERROR_BUFFER {
+    OMX_U32 errorNumber;   // Error number should be no more than MAX_ERR_NUM
+    OMX_S64 timeStamp;      // presentation time stamp
+    OMX_VIDEO_ERROR_INFO errorArray[MAX_ERR_NUM];
+};
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
