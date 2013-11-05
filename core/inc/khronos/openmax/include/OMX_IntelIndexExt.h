@@ -63,11 +63,12 @@ typedef enum OMX_INTELINDEXEXTTYPE {
     OMX_IndexExtRotationDegrees,                    /**<reference: Rotation for decode*/
     OMX_IndexExtSyncEncoding,                       /**<reference: Sync mode for encode*/
     OMX_IndexExtPrependSPSPPS,
+    /* Error report by WebRTC */
+    OMX_IndexExtEnableErrorReport,                  /**<reference: EnableErrorReport for decoder */
+    // Index for VPP must always be put at the end
 #ifdef TARGET_HAS_VPP
     OMX_IndexExtVppBufferNum,                       /**<reference: vpp buffer number*/
 #endif
-    /* Error report by WebRTC */
-    OMX_IndexExtEnableErrorReport,                  /**<reference: EnableErrorReport for decoder */
     OMX_IntelIndexExtMax = 0x7FFFFFFF
 } OMX_INTELINDEXEXTTYPE;
 
