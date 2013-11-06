@@ -1073,9 +1073,6 @@ OMX_ERRORTYPE ComponentBase::CBaseFillThisBuffer(
     if (!port)
         return OMX_ErrorBadParameter;
 
-    if (pBuffer->pOutputPortPrivate != port)
-        return OMX_ErrorBadParameter;
-
     if (port->IsEnabled()) {
         if (state != OMX_StateIdle && state != OMX_StateExecuting &&
             state != OMX_StatePause)

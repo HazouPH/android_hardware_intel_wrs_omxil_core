@@ -362,15 +362,14 @@ OMX_ERRORTYPE PortBase::UseBuffer(OMX_BUFFERHEADERTYPE **ppBufferHdr,
     buffer_hdr->nAllocLen = nSizeBytes;
     buffer_hdr->pAppPrivate = pAppPrivate;
     buffer_hdr->pInputPortPrivate = NULL;
+    buffer_hdr->pOutputPortPrivate = NULL;
     if (portdefinition.eDir == OMX_DirInput) {
         buffer_hdr->nInputPortIndex = nPortIndex;
         buffer_hdr->nOutputPortIndex = 0x7fffffff;
-        buffer_hdr->pOutputPortPrivate = NULL;
     }
     else {
         buffer_hdr->nOutputPortIndex = nPortIndex;
         buffer_hdr->nInputPortIndex = 0x7fffffff;
-        buffer_hdr->pOutputPortPrivate = this;
     }
 
     buffer_hdrs = __list_add_tail(buffer_hdrs, entry);
@@ -462,15 +461,14 @@ OMX_ERRORTYPE PortBase:: AllocateBuffer(OMX_BUFFERHEADERTYPE **ppBuffer,
     buffer_hdr->nAllocLen = nSizeBytes;
     buffer_hdr->pAppPrivate = pAppPrivate;
     buffer_hdr->pInputPortPrivate = NULL;
+    buffer_hdr->pOutputPortPrivate = NULL;
     if (portdefinition.eDir == OMX_DirInput) {
         buffer_hdr->nInputPortIndex = nPortIndex;
         buffer_hdr->nOutputPortIndex = (OMX_U32)-1;
-        buffer_hdr->pOutputPortPrivate = NULL;
     }
     else {
         buffer_hdr->nOutputPortIndex = nPortIndex;
         buffer_hdr->nInputPortIndex = (OMX_U32)-1;
-        buffer_hdr->pOutputPortPrivate = this;
     }
 
     buffer_hdrs = __list_add_tail(buffer_hdrs, entry);

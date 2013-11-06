@@ -149,6 +149,13 @@ typedef struct OMX_VIDEO_CONFIG_PRI_INFOTYPE {
 } OMX_VIDEO_CONFIG_PRI_INFOTYPE;
 
 // Error reporting data structure
+typedef struct OMX_VIDEO_CONFIG_INTEL_ERROR_REPORT {
+    OMX_U32 nSize;
+    OMX_VERSIONTYPE nVersion;
+    OMX_U32 nPortIndex;
+    OMX_BOOL bEnable;
+} OMX_VIDEO_CONFIG_INTEL_ERROR_REPORT;
+
 #define MAX_ERR_NUM 10
 
 typedef enum
