@@ -768,8 +768,13 @@ OMX_ERRORTYPE ComponentBase::CBaseGetExtensionIndex(
     }
 #endif
     
-	if (!strcmp(cParameterName, "OMX.Intel.index.enableErrorReport")) {
+       if (!strcmp(cParameterName, "OMX.Intel.index.enableErrorReport")) {
         *pIndexType = static_cast<OMX_INDEXTYPE>(OMX_IndexExtEnableErrorReport);
+        return OMX_ErrorNone;
+    }
+
+    if (!strcmp(cParameterName, "OMX.Intel.index.vp8ForceKFrame")) {
+        *pIndexType = static_cast<OMX_INDEXTYPE>(OMX_IndexExtVP8ForceKFrame);
         return OMX_ErrorNone;
     }
 

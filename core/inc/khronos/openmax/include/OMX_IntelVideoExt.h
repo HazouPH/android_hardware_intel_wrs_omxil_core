@@ -178,6 +178,14 @@ typedef struct OMX_VIDEO_ERROR_BUFFER {
     OMX_VIDEO_ERROR_INFO errorArray[MAX_ERR_NUM];
 };
 
+// Force K frame for VP8 encode
+typedef struct OMX_VIDEO_CONFIG_INTEL_VP8_FORCE_KFRAME {
+    OMX_U32 nSize;
+    OMX_VERSIONTYPE nVersion;
+    OMX_U32 nPortIndex;
+    OMX_BOOL bForceKFrame;
+} OMX_VIDEO_CONFIG_INTEL_VP8_FORCE_KFRAME;
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
