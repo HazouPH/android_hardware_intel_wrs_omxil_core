@@ -435,6 +435,11 @@ private:
     /* state lock */
     pthread_mutex_t state_block;
 
+    /* adaptive playback param */
+    OMX_BOOL mEnableAdaptivePlayback;
+    OMX_U32 mMaxFrameWidth;
+    OMX_U32 mMaxFrameHeight;
+
     /* omx specification version */
 #ifndef ANDROID
     const static OMX_U8 OMX_SPEC_VERSION_MAJOR = 1;

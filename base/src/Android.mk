@@ -33,6 +33,7 @@ LOCAL_C_INCLUDES := \
 	$(WRS_OMXIL_CORE_ROOT)/utils/inc \
 	$(WRS_OMXIL_CORE_ROOT)/base/inc \
 	$(WRS_OMXIL_CORE_ROOT)/core/inc/khronos/openmax/include \
+        $(call include-path-for, frameworks-native)/media/hardware \
         $(TOP)/frameworks/native/include/media/openmax
 
 include $(BUILD_STATIC_LIBRARY)

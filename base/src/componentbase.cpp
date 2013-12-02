@@ -29,12 +29,15 @@
 #include <queue.h>
 #include <workqueue.h>
 #include <OMX_IndexExt.h>
+#include <HardwareAPI.h>
 
 //#define LOG_NDEBUG 0
 
 #define LOG_TAG "componentbase"
 #include <log.h>
 
+static const OMX_U32 kMaxAdaptiveStreamingWidth = 1920;
+static const OMX_U32 kMaxAdaptiveStreamingHeight = 1088;
 /*
  * CmdProcessWork
  */
@@ -127,6 +130,7 @@ void ComponentBase::__ComponentBase(void)
 
     ports = NULL;
     nr_ports = 0;
+    mEnableAdaptivePlayback = OMX_FALSE;
     memset(&portparam, 0, sizeof(portparam));
 
     state = OMX_StateUnloaded;
@@ -466,7 +470,6 @@ OMX_ERRORTYPE ComponentBase::CBaseGetParameter(
 
     if (hComponent != handle)
         return OMX_ErrorBadParameter;
-
     switch (nParamIndex) {
     case OMX_IndexParamAudioInit:
     case OMX_IndexParamVideoInit:
@@ -574,6 +577,13 @@ OMX_ERRORTYPE ComponentBase::CBaseSetParameter(
                 return OMX_ErrorIncorrectStateOperation;
         }
 
+        if (index == 1 && mEnableAdaptivePlayback == OMX_TRUE) {
+            if (p->format.video.nFrameWidth < mMaxFrameWidth)
+                p->format.video.nFrameWidth = mMaxFrameWidth;
+            if (p->format.video.nFrameHeight < mMaxFrameHeight)
+                p->format.video.nFrameHeight = mMaxFrameHeight;
+        }
+
         ret = port->SetPortDefinition(p, false);
         if (ret != OMX_ErrorNone) {
             return ret;
@@ -609,6 +619,43 @@ OMX_ERRORTYPE ComponentBase::CBaseSetParameter(
         if (ret != OMX_ErrorNone) {
             SetWorkingRole(NULL);
             return ret;
+        }
+        break;
+    }
+    case OMX_IndexExtPrepareForAdaptivePlayback: {
+        android::PrepareForAdaptivePlaybackParams* p =
+                (android::PrepareForAdaptivePlaybackParams *)pComponentParameterStructure;
+
+        ret = CheckTypeHeader(p, sizeof(*p));
+        if (ret != OMX_ErrorNone)
+            return ret;
+
+        if (p->nPortIndex != 1)
+            return OMX_ErrorBadPortIndex;
+
+        if (!(working_role != NULL && !strncmp((char*)working_role, "video_decoder", 13)))
+            return  OMX_ErrorBadParameter;
+
+        if (p->nMaxFrameWidth > kMaxAdaptiveStreamingWidth
+                || p->nMaxFrameHeight > kMaxAdaptiveStreamingHeight) {
+            LOGE("resolution %d x %d exceed max driver support %d x %d\n",p->nMaxFrameWidth, p->nMaxFrameHeight,
+                    kMaxAdaptiveStreamingWidth, kMaxAdaptiveStreamingHeight);
+            return OMX_ErrorBadParameter;
+        }
+        mEnableAdaptivePlayback = p->bEnable;
+        if (mEnableAdaptivePlayback != OMX_TRUE)
+            return OMX_ErrorBadParameter;
+
+        mMaxFrameWidth = p->nMaxFrameWidth;
+        mMaxFrameHeight = p->nMaxFrameHeight;
+        /* update output port definition */
+        OMX_PARAM_PORTDEFINITIONTYPE paramPortDefinitionOutput;
+        if (nr_ports > p->nPortIndex && ports[p->nPortIndex]) {
+            memcpy(&paramPortDefinitionOutput,ports[p->nPortIndex]->GetPortDefinition(),
+                    sizeof(paramPortDefinitionOutput));
+            paramPortDefinitionOutput.format.video.nFrameWidth = mMaxFrameWidth;
+            paramPortDefinitionOutput.format.video.nFrameHeight = mMaxFrameHeight;
+            ports[p->nPortIndex]->SetPortDefinition(&paramPortDefinitionOutput, true);
         }
         break;
     }
@@ -768,8 +815,13 @@ OMX_ERRORTYPE ComponentBase::CBaseGetExtensionIndex(
     }
 #endif
     
-       if (!strcmp(cParameterName, "OMX.Intel.index.enableErrorReport")) {
+    if (!strcmp(cParameterName, "OMX.Intel.index.enableErrorReport")) {
         *pIndexType = static_cast<OMX_INDEXTYPE>(OMX_IndexExtEnableErrorReport);
+        return OMX_ErrorNone;
+    }
+
+    if (!strcmp(cParameterName, "OMX.google.android.index.prepareForAdaptivePlayback")) {
+        *pIndexType = static_cast<OMX_INDEXTYPE>(OMX_IndexExtPrepareForAdaptivePlayback);
         return OMX_ErrorNone;
     }
 
