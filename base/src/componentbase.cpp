@@ -1817,9 +1817,13 @@ void ComponentBase::Work(void)
         }
 
         if (ret == OMX_ErrorNone) {
-            PostProcessBuffers(buffers, &retain[0]);
+            if (!working_role || (strncmp((char*)working_role, "video_encoder", 13) != 0))
+                PostProcessBuffers(buffers, &retain[0]);
 
             for (i = 0; i < nr_ports; i++) {
+                if (*buffers[i] == NULL)
+                    continue;
+
                 if(retain[i] == BUFFER_RETAIN_GETAGAIN) {
                     ports[i]->RetainThisBuffer(*buffers[i], false);
                 }
@@ -1861,8 +1865,10 @@ bool ComponentBase::IsAllBufferAvailable(void)
     for (i = 0; i < nr_ports; i++) {
         OMX_U32 length = 0;
 
-        if (ports[i]->IsEnabled())
-            length = ports[i]->BufferQueueLength();
+        if (ports[i]->IsEnabled()) {
+            length += ports[i]->BufferQueueLength();
+            length += ports[i]->RetainedBufferQueueLength();
+        }
 
         if (length)
             nr_avail++;

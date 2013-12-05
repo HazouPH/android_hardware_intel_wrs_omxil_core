@@ -608,7 +608,7 @@ OMX_BUFFERHEADERTYPE *PortBase::PopBuffer(void)
     buffer = (OMX_BUFFERHEADERTYPE *)queue_pop_head(&bufferq);
     pthread_mutex_unlock(&bufferq_lock);
 
-    LOGV_IF(buffer != NULL, "%s(): %s:%s:PortIndex %lu:pBuffer %p:\n",
+    LOGV_IF((buffer != NULL || RetainedBufferQueueLength() > 0), "%s(): %s:%s:PortIndex %lu:pBuffer %p:\n",
             __FUNCTION__, cbase->GetName(), cbase->GetWorkingRole(),
             portdefinition.nPortIndex, buffer);
 
@@ -622,6 +622,17 @@ OMX_U32 PortBase::BufferQueueLength(void)
     pthread_mutex_lock(&bufferq_lock);
     length = queue_length(&bufferq);
     pthread_mutex_unlock(&bufferq_lock);
+
+    return length;
+}
+
+OMX_U32 PortBase::RetainedBufferQueueLength(void)
+{
+    OMX_U32 length;
+
+    pthread_mutex_lock(&retainedbufferq_lock);
+    length = queue_length(&retainedbufferq);
+    pthread_mutex_unlock(&retainedbufferq_lock);
 
     return length;
 }
@@ -746,13 +757,16 @@ OMX_ERRORTYPE PortBase::RetainThisBuffer(OMX_BUFFERHEADERTYPE *pBuffer,
 
     /* push at tail of retainedbufferq */
     if (accumulate == true) {
-        /* do not accumulate a buffer set EOS flag */
-        if (pBuffer->nFlags & OMX_BUFFERFLAG_EOS) {
-            LOGE("%s(): %s:%s:PortIndex %lu:pBuffer %p: exit failure, "
-                 "cannot accumulate EOS buffer\n", __FUNCTION__,
-                 cbase->GetName(), cbase->GetWorkingRole(),
-                 portdefinition.nPortIndex, pBuffer);
-            return OMX_ErrorBadParameter;
+
+        if (cbase->GetWorkingRole() == NULL || (strncmp((char*)cbase->GetWorkingRole(), "video_encoder", 13) != 0)) {
+            /* do not accumulate a buffer set EOS flag if not video encoder*/
+            if (pBuffer->nFlags & OMX_BUFFERFLAG_EOS) {
+                LOGE("%s(): %s:%s:PortIndex %lu:pBuffer %p: exit failure, "
+                     "cannot accumulate EOS buffer\n", __FUNCTION__,
+                     cbase->GetName(), cbase->GetWorkingRole(),
+                     portdefinition.nPortIndex, pBuffer);
+                return OMX_ErrorBadParameter;
+            }
         }
 
         pthread_mutex_lock(&retainedbufferq_lock);
@@ -822,6 +836,33 @@ void PortBase::ReturnAllRetainedBuffers(void)
             "%s(): %s:%s:PortIndex %lu: returned all retained buffers (%d)\n",
             __FUNCTION__, cbase->GetName(), cbase->GetWorkingRole(),
             portdefinition.nPortIndex, i);
+}
+
+void PortBase::ReturnOneRetainedBuffer(void)
+{
+    OMX_BUFFERHEADERTYPE *buffer;
+    OMX_ERRORTYPE ret;
+
+    pthread_mutex_lock(&retainedbufferq_lock);
+
+    buffer = (OMX_BUFFERHEADERTYPE *)queue_pop_head(&retainedbufferq);
+
+    if (buffer) {
+        LOGV("%s(): %s:%s:PortIndex %lu: returns a retained buffer "
+             "(%p:%d/%d)\n", __FUNCTION__, cbase->GetName(),
+             cbase->GetWorkingRole(), portdefinition.nPortIndex,
+             buffer, i++, queue_length(&retainedbufferq));
+
+        ret = ReturnThisBuffer(buffer);
+        if (ret != OMX_ErrorNone)
+            LOGE("%s(): %s:%s:PortIndex %lu: failed (ret : 0x%x08x)\n",
+                 __FUNCTION__,
+                 cbase->GetName(), cbase->GetWorkingRole(),
+                 portdefinition.nPortIndex, ret);
+    }
+
+    pthread_mutex_unlock(&retainedbufferq_lock);
+
 }
 
 /* SendCommand:Flush/PortEnable/Disable */

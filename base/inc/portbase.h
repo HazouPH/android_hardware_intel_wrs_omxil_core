@@ -92,6 +92,7 @@ public:
     OMX_ERRORTYPE PushThisBuffer(OMX_BUFFERHEADERTYPE *pBuffer);
     OMX_BUFFERHEADERTYPE *PopBuffer(void);
     OMX_U32 BufferQueueLength(void);
+    OMX_U32 RetainedBufferQueueLength(void);
 
     /* Empty/FillBufferDone */
     OMX_ERRORTYPE ReturnThisBuffer(OMX_BUFFERHEADERTYPE *pBuffer);
@@ -106,6 +107,7 @@ public:
      * accumulated buffers to omx-il clients.
      */
     void ReturnAllRetainedBuffers(void);
+    void ReturnOneRetainedBuffer(void);
 
     /* flush all buffers not under processing */
     OMX_ERRORTYPE FlushPort(void);
