@@ -584,6 +584,11 @@ OMX_ERRORTYPE ComponentBase::CBaseSetParameter(
                 p->format.video.nFrameHeight = mMaxFrameHeight;
         }
 
+        if (working_role != NULL && !strncmp((char*)working_role, "video_encoder", 13)) {
+            if(p->format.video.eColorFormat == OMX_COLOR_FormatUnused)
+                p->nBufferSize = p->format.video.nFrameWidth * p->format.video.nFrameHeight *3/2;
+        }
+
         ret = port->SetPortDefinition(p, false);
         if (ret != OMX_ErrorNone) {
             return ret;

@@ -168,8 +168,6 @@ OMX_U32 PortBase::getFrameBufSize(OMX_COLOR_FORMATTYPE colorFormat, OMX_U32 widt
     case OMX_COLOR_FormatYUV420Planar:
     case OMX_COLOR_FormatYUV420SemiPlanar:
         return (width * height * 3) >> 1;
-    case OMX_COLOR_FormatUnused:
-        return (width * height * 3) >> 1;
 
     default:
         LOGV("unsupport color format !");
