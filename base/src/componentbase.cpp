@@ -1856,6 +1856,10 @@ void ComponentBase::Work(void)
         return;
     }
 
+    memset(buffers, 0, sizeof(OMX_BUFFERHEADERTYPE *) * nr_ports);
+    memset(buffers_hdr, 0, sizeof(OMX_BUFFERHEADERTYPE *) * nr_ports);
+    memset(buffers_org, 0, sizeof(OMX_BUFFERHEADERTYPE *) * nr_ports);
+
     pthread_mutex_lock(&ports_block);
 
     while(IsAllBufferAvailable())
@@ -1878,7 +1882,7 @@ void ComponentBase::Work(void)
                 PostProcessBuffers(buffers, &retain[0]);
 
             for (i = 0; i < nr_ports; i++) {
-                if (*buffers[i] == NULL)
+                if (buffers_hdr[i] == NULL)
                     continue;
 
                 if(retain[i] == BUFFER_RETAIN_GETAGAIN) {
@@ -1900,6 +1904,9 @@ void ComponentBase::Work(void)
         else {
 
             for (i = 0; i < nr_ports; i++) {
+                if (buffers_hdr[i] == NULL)
+                    continue;
+
                 /* return buffers by hands, these buffers're not in queue */
                 ports[i]->ReturnThisBuffer(*buffers[i]);
                 /* flush ports */
