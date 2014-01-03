@@ -66,7 +66,8 @@ typedef enum OMX_INTELINDEXEXTTYPE {
     /* Error report by WebRTC */
     OMX_IndexExtEnableErrorReport,                  /**<reference: EnableErrorReport for decoder */
     OMX_IndexExtPrepareForAdaptivePlayback,         /**<reference: Prepare for AdaptivePlayback*/
-    OMX_IndexExtVP8ForceKFrame,
+    OMX_IndexExtVP8ForceKFrame,                     /**<reference: For VP8 Force K Frame*/
+    OMX_IndexExtVP8MaxFrameSize,                    /**<reference: For VP8 Max Frame Size*/
     // Index for VPP must always be put at the end
 #ifdef TARGET_HAS_VPP
     OMX_IndexExtVppBufferNum,                       /**<reference: vpp buffer number*/
