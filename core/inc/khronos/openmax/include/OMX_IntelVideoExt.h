@@ -168,7 +168,7 @@ typedef enum
 typedef struct OMX_VIDEO_ERROR_INFO {
     OMX_VIDEO_DECODE_ERRORTYPE type;
     union {
-        typedef struct {OMX_U32 start_mb; OMX_U32 end_mb;} mb_pos;
+        struct {OMX_U32 start_mb; OMX_U32 end_mb;} mb_pos;
     } error_data;
 };
 
