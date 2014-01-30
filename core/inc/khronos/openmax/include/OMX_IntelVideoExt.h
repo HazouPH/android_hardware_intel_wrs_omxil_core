@@ -160,13 +160,15 @@ typedef struct OMX_VIDEO_CONFIG_INTEL_ERROR_REPORT {
 
 typedef enum
 {
-    OMX_Decode_SliceMissing  = 0,
+    OMX_Decode_HeaderError   = 0,
     OMX_Decode_MBError       = 1,
-    OMX_Decode_RefMissing    = 2,
+    OMX_Decode_SliceMissing  = 2,
+    OMX_Decode_RefMissing    = 3,
 } OMX_VIDEO_DECODE_ERRORTYPE;
 
 typedef struct OMX_VIDEO_ERROR_INFO {
     OMX_VIDEO_DECODE_ERRORTYPE type;
+    OMX_U32 num_mbs;
     union {
         struct {OMX_U32 start_mb; OMX_U32 end_mb;} mb_pos;
     } error_data;
