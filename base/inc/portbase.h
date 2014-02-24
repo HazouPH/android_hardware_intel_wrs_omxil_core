@@ -88,6 +88,7 @@ public:
      */
     void WaitPortBufferCompletion(void);
 
+    OMX_ERRORTYPE WaitPortBufferCompletionTimeout(int64_t mSec);
     /* Empty/FillThisBuffer */
     OMX_ERRORTYPE PushThisBuffer(OMX_BUFFERHEADERTYPE *pBuffer);
     OMX_BUFFERHEADERTYPE *PopBuffer(void);

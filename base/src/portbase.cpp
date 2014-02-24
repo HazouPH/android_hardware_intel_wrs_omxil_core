@@ -579,6 +579,32 @@ void PortBase::WaitPortBufferCompletion(void)
     pthread_mutex_unlock(&hdrs_lock);
 }
 
+OMX_ERRORTYPE PortBase::WaitPortBufferCompletionTimeout(int64_t milliseconds)
+{
+    int rc = 0;
+    OMX_ERRORTYPE ret = OMX_ErrorNone;
+    pthread_mutex_lock(&hdrs_lock);
+    if (!buffer_hdrs_completion) {
+        LOGV("%s(): %s:%s:PortIndex %lu: wait for buffer header completion\n",
+             __FUNCTION__, cbase->GetName(), cbase->GetWorkingRole(),
+             portdefinition.nPortIndex);
+        struct timespec tv;
+        clock_gettime(CLOCK_REALTIME, &tv);
+        tv.tv_sec += milliseconds/1000;
+        tv.tv_nsec+= (milliseconds%1000) * 1000000;
+        rc = pthread_cond_timedwait(&hdrs_wait, &hdrs_lock, &tv);
+    }
+    if (rc == ETIMEDOUT) {
+        LOGE("%s(): %s:%s:PortIndex %lu: wokeup (buffer header timeout)\n",
+             __FUNCTION__, cbase->GetName(), cbase->GetWorkingRole(),
+             portdefinition.nPortIndex);
+        ret = OMX_ErrorTimeout;
+    }
+    buffer_hdrs_completion = !buffer_hdrs_completion;
+    pthread_mutex_unlock(&hdrs_lock);
+    return ret;
+}
+
 /* Empty/FillThisBuffer */
 OMX_ERRORTYPE PortBase::PushThisBuffer(OMX_BUFFERHEADERTYPE *pBuffer)
 {
@@ -990,7 +1016,15 @@ OMX_ERRORTYPE PortBase::TransState(OMX_U8 transition)
     }
 
     if (transition == OMX_PortEnabled) {
-        WaitPortBufferCompletion();
+        if (cbase->GetWorkingRole() != NULL &&
+                !strncmp (cbase->GetWorkingRole(),"video_decoder", 13 )) {
+            ret = WaitPortBufferCompletionTimeout(800); //0.8s timeout
+            if (ret != OMX_ErrorNone) {
+                goto unlock;
+            }
+        } else {
+            WaitPortBufferCompletion();
+        }
         portdefinition.bEnabled = OMX_TRUE;
     }
     else if(transition == OMX_PortDisabled) {

@@ -1696,13 +1696,12 @@ void ComponentBase::TransStatePort(OMX_U32 port_index, OMX_U8 state)
                 data1 = OMX_CommandPortDisable;
             }
             data2 = i;
-        }
-        else {
+        } else {
             event = OMX_EventError;
             data1 = ret;
             data2 = 0;
         }
-        callbacks->EventHandler(handle, appdata, OMX_EventCmdComplete,
+        callbacks->EventHandler(handle, appdata, event,
                                 data1, data2, NULL);
     }
     pthread_mutex_unlock(&ports_block);
