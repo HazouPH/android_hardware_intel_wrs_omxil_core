@@ -68,6 +68,8 @@ typedef enum OMX_INTELINDEXEXTTYPE {
     OMX_IndexExtPrepareForAdaptivePlayback,         /**<reference: Prepare for AdaptivePlayback*/
     OMX_IndexExtVP8ForceKFrame,                     /**<reference: For VP8 Force K Frame*/
     OMX_IndexExtVP8MaxFrameSizeRatio,                    /**<reference: For VP8 Max Frame Size*/
+    OMX_IndexExtVP8NumberOfTemporalLayer,               /**<reference: For SAND VP8 Number of Layer*/
+    OMX_IndexExtVP8TemporalLayerBitRateFrameRate,       /**<reference: For SAND VP8 bitrate and framerate for every layer*/
     // Index for VPP must always be put at the end
 #ifdef TARGET_HAS_VPP
     OMX_IndexExtVppBufferNum,                       /**<reference: vpp buffer number*/

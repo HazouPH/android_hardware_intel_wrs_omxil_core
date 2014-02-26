@@ -196,6 +196,23 @@ typedef struct OMX_VIDEO_CONFIG_INTEL_VP8_MAX_FRAME_SIZE_RATIO {
     OMX_U32 nMaxFrameSizeRatio;
 } OMX_VIDEO_CONFIG_INTEL_VP8_MAX_FRAME_SIZE_RATIO;
 
+// number of temporal layer for WebRTC and Sand
+typedef struct OMX_VIDEO_PARAM_INTEL_VP8_NUMBER_OF_TEMPORAL_LAYER {
+    OMX_U32 nSize;
+    OMX_VERSIONTYPE nVersion;
+    OMX_U32 nPortIndex;
+    OMX_U32 nNumberOfTemporalLayer;
+} OMX_VIDEO_PARAM_INTEL_VP8_NUMBER_OF_TEMPORAL_LAYER;
+
+// Layer and Bitrate Framerate data paires for SAND VP8 encode
+typedef struct OMX_VIDEO_CONFIG_INTEL_VP8_TEMPORAL_LAYER_BITRATE_FRAMERATE {
+    OMX_U32 nSize;
+    OMX_VERSIONTYPE nVersion;
+    OMX_U32 nPortIndex;
+    OMX_U32 nLayerID;
+    OMX_U32 nBitrate;
+    OMX_U32 nFramerate;
+} OMX_VIDEO_CONFIG_INTEL_VP8_TEMPORAL_LAYER_BITRATE_FRAMERATE;
 
 #ifdef __cplusplus
 }
