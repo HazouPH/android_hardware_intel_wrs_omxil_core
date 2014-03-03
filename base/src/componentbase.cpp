@@ -1432,16 +1432,24 @@ out:
 
 inline OMX_ERRORTYPE ComponentBase::TransStateToIdle(OMX_STATETYPE current)
 {
-    OMX_ERRORTYPE ret;
+    OMX_ERRORTYPE ret = OMX_ErrorNone;
 
     if (current == OMX_StateLoaded) {
         OMX_U32 i;
         for (i = 0; i < nr_ports; i++) {
-             if (ports[i]->IsEnabled())
-                 ports[i]->WaitPortBufferCompletion();
+            if (ports[i]->IsEnabled()) {
+                if (GetWorkingRole() != NULL &&
+                        !strncmp (GetWorkingRole(),"video_decoder", 13 )) {
+                    ret = ports[i]->WaitPortBufferCompletionTimeout(800);
+                } else {
+                    ports[i]->WaitPortBufferCompletion();
+                }
+            }
         }
 
-        ret = ProcessorInit();
+        if (ret == OMX_ErrorNone) {
+            ret = ProcessorInit();
+        }
         if (ret != OMX_ErrorNone) {
             LOGE("%s:%s: ProcessorInit() failed (ret : 0x%08x)\n",
                  GetName(), GetWorkingRole(), ret);
