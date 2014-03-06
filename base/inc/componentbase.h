@@ -289,7 +289,8 @@ protected:
     /* ports big lock, must be held when accessing all ports at one time */
     pthread_mutex_t ports_block;
 
-
+    /* adaptive playback param */
+    OMX_BOOL mEnableAdaptivePlayback;
 private:
     /* common routines for constructor */
     void __ComponentBase(void);
@@ -435,8 +436,6 @@ private:
     /* state lock */
     pthread_mutex_t state_block;
 
-    /* adaptive playback param */
-    OMX_BOOL mEnableAdaptivePlayback;
     OMX_U32 mMaxFrameWidth;
     OMX_U32 mMaxFrameHeight;
 
