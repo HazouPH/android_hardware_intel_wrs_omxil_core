@@ -835,6 +835,16 @@ OMX_ERRORTYPE ComponentBase::CBaseGetExtensionIndex(
         return OMX_ErrorNone;
     }
 
+    if (!strcmp(cParameterName, "OMX.Intel.index.vp8MaxFrameRatio")) {
+        *pIndexType = static_cast<OMX_INDEXTYPE>(OMX_IndexExtVP8MaxFrameSizeRatio);
+        return OMX_ErrorNone;
+    }
+
+    if (!strcmp(cParameterName, "OMX.Intel.index.numberOfTemporalLayer")) {
+        *pIndexType = static_cast<OMX_INDEXTYPE>(OMX_IndexExtNumberOfTemporalLayer);
+        return OMX_ErrorNone;
+    }
+
     return OMX_ErrorUnsupportedIndex;
 }
 

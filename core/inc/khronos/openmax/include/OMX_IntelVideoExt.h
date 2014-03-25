@@ -63,6 +63,9 @@ typedef struct OMX_VIDEO_CONFIG_INTEL_BITRATETYPE {
      OMX_U32 nWindowSize;          // Window size in milliseconds allowed for bitrate to reach target
      OMX_U32 nInitialQP;           // Initial QP for I frames
      OMX_U32 nMinQP;
+     OMX_U32 nMaxQP;
+     OMX_U32 nFrameRate;
+     OMX_U32 nTemporalID;
 } OMX_VIDEO_CONFIG_INTEL_BITRATETYPE;
 
 typedef enum OMX_VIDEO_INTEL_CONTROLRATETYPE {
@@ -197,22 +200,13 @@ typedef struct OMX_VIDEO_CONFIG_INTEL_VP8_MAX_FRAME_SIZE_RATIO {
 } OMX_VIDEO_CONFIG_INTEL_VP8_MAX_FRAME_SIZE_RATIO;
 
 // number of temporal layer for WebRTC and Sand
-typedef struct OMX_VIDEO_PARAM_INTEL_VP8_NUMBER_OF_TEMPORAL_LAYER {
+typedef struct OMX_VIDEO_PARAM_INTEL_NUMBER_OF_TEMPORAL_LAYER {
     OMX_U32 nSize;
     OMX_VERSIONTYPE nVersion;
     OMX_U32 nPortIndex;
     OMX_U32 nNumberOfTemporalLayer;
-} OMX_VIDEO_PARAM_INTEL_VP8_NUMBER_OF_TEMPORAL_LAYER;
+} OMX_VIDEO_PARAM_INTEL_NUMBER_OF_TEMPORAL_LAYER;
 
-// Layer and Bitrate Framerate data paires for SAND VP8 encode
-typedef struct OMX_VIDEO_CONFIG_INTEL_VP8_TEMPORAL_LAYER_BITRATE_FRAMERATE {
-    OMX_U32 nSize;
-    OMX_VERSIONTYPE nVersion;
-    OMX_U32 nPortIndex;
-    OMX_U32 nLayerID;
-    OMX_U32 nBitrate;
-    OMX_U32 nFramerate;
-} OMX_VIDEO_CONFIG_INTEL_VP8_TEMPORAL_LAYER_BITRATE_FRAMERATE;
 
 #ifdef __cplusplus
 }
