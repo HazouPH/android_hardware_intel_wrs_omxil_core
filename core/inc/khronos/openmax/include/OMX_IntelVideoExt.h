@@ -68,21 +68,9 @@ typedef struct OMX_VIDEO_CONFIG_INTEL_BITRATETYPE {
      OMX_U32 nTemporalID;
 } OMX_VIDEO_CONFIG_INTEL_BITRATETYPE;
 
-typedef enum OMX_VIDEO_INTEL_CONTROLRATETYPE {
-    OMX_Video_Intel_ControlRateDisable,
-    OMX_Video_Intel_ControlRateVariable,
-    OMX_Video_Intel_ControlRateConstant,
-    OMX_Video_Intel_ControlRateVideoConferencingMode,
-    OMX_Video_Intel_ControlRateMax = 0x7FFFFFFF
-} OMX_VIDEO_INTEL_CONTROLRATETYPE;
-
-typedef struct OMX_VIDEO_PARAM_INTEL_BITRATETYPE {
-     OMX_U32 nSize;
-     OMX_VERSIONTYPE nVersion;
-     OMX_U32 nPortIndex;
-     OMX_VIDEO_INTEL_CONTROLRATETYPE eControlRate;
-     OMX_U32 nTargetBitrate;
-} OMX_VIDEO_PARAM_INTEL_BITRATETYPE;
+typedef enum  {
+    OMX_Video_Intel_ControlRateVideoConferencingMode = OMX_Video_ControlRateVendorStartUnused + 1
+};
 
 typedef struct OMX_VIDEO_PARAM_INTEL_AVC_DECODE_SETTINGS {
      OMX_U32 nSize;                       // Size of the structure
