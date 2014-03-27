@@ -208,6 +208,14 @@ typedef struct OMX_VIDEO_PARAM_INTEL_NUMBER_OF_TEMPORAL_LAYER {
 } OMX_VIDEO_PARAM_INTEL_NUMBER_OF_TEMPORAL_LAYER;
 
 
+// Request OMX to allocate a black frame to video mute feature
+typedef struct OMX_VIDEO_INTEL_REQUEST_BALCK_FRAME_POINTER {
+    OMX_U32 nSize;
+    OMX_VERSIONTYPE nVersion;
+    OMX_U32 nPortIndex;
+    OMX_U32 nFramePointer;
+} OMX_VIDEO_INTEL_REQUEST_BALCK_FRAME_POINTER;
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
