@@ -187,13 +187,15 @@ typedef struct OMX_VIDEO_CONFIG_INTEL_VP8_MAX_FRAME_SIZE_RATIO {
     OMX_U32 nMaxFrameSizeRatio;
 } OMX_VIDEO_CONFIG_INTEL_VP8_MAX_FRAME_SIZE_RATIO;
 
-// number of temporal layer for WebRTC and Sand
-typedef struct OMX_VIDEO_PARAM_INTEL_NUMBER_OF_TEMPORAL_LAYER {
+// temporal layer for Sand
+typedef struct OMX_VIDEO_PARAM_INTEL_TEMPORAL_LAYER {
     OMX_U32 nSize;
     OMX_VERSIONTYPE nVersion;
     OMX_U32 nPortIndex;
     OMX_U32 nNumberOfTemporalLayer;
-} OMX_VIDEO_PARAM_INTEL_NUMBER_OF_TEMPORAL_LAYER;
+    OMX_U32 nPeriodicity;
+    OMX_U32 nLayerID[32];
+} OMX_VIDEO_PARAM_INTEL_TEMPORAL_LAYER;
 
 
 // Request OMX to allocate a black frame to video mute feature
