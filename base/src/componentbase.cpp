@@ -849,6 +849,26 @@ OMX_ERRORTYPE ComponentBase::CBaseGetExtensionIndex(
         return OMX_ErrorNone;
     }
 
+    if (!strcmp(cParameterName, "OMX.Intel.index.vuiEnable")) {
+        *pIndexType = static_cast<OMX_INDEXTYPE>(OMX_IndexParamIntelAVCVUI);
+        return OMX_ErrorNone;
+    }
+
+    if (!strcmp(cParameterName, "OMX.Intel.index.sliceNumber")) {
+        *pIndexType = static_cast<OMX_INDEXTYPE>(OMX_IndexConfigIntelSliceNumbers);
+        return OMX_ErrorNone;
+    }
+
+    if (!strcmp(cParameterName, "OMX.Intel.index.intelBitrateConfig")) {
+        *pIndexType = static_cast<OMX_INDEXTYPE>(OMX_IndexConfigIntelBitrate);
+        return OMX_ErrorNone;
+    }
+
+    if (!strcmp(cParameterName, "OMX.Intel.index.autoIntraRefresh")) {
+        *pIndexType = static_cast<OMX_INDEXTYPE>(OMX_IndexConfigIntelAIR);
+        return OMX_ErrorNone;
+    }
+
     return OMX_ErrorUnsupportedIndex;
 }
 
