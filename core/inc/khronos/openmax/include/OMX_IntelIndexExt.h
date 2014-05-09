@@ -66,9 +66,8 @@ typedef enum OMX_INTELINDEXEXTTYPE {
     /* Error report by WebRTC */
     OMX_IndexExtEnableErrorReport,                  /**<reference: EnableErrorReport for decoder */
     OMX_IndexExtPrepareForAdaptivePlayback,         /**<reference: Prepare for AdaptivePlayback*/
-    OMX_IndexExtVP8ForceKFrame,                     /**<reference: For VP8 Force K Frame*/
     OMX_IndexExtVP8MaxFrameSizeRatio,               /**<reference: For VP8 Max Frame Size*/
-    OMX_IndexExtNumberOfTemporalLayer,              /**<reference: For Number of Layer*/
+    OMX_IndexExtTemporalLayer,                      /**<reference: For Temporal Layer*/
     OMX_IndexExtRequestBlackFramePointer,           /**<reference: OMX_VIDEO_INTEL_REQUEST_BALCK_FRAME_POINTER*/
 
     // Index for VPP must always be put at the end
