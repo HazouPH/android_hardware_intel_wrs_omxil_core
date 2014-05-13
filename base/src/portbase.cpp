@@ -1023,6 +1023,10 @@ OMX_ERRORTYPE PortBase::TransState(OMX_U8 transition)
         if (cbase->GetWorkingRole() != NULL &&
                 !strncmp (cbase->GetWorkingRole(),"video_decoder", 13 )) {
             ret = WaitPortBufferCompletionTimeout(800); //0.8s timeout
+            if (!nr_buffer_hdrs) {
+                // event is trigger by freeing buffer instead of allocating buffer
+                ret = OMX_ErrorBadParameter;
+            }
             if (ret != OMX_ErrorNone) {
                 goto unlock;
             }
