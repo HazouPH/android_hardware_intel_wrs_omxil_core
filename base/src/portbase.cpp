@@ -267,6 +267,9 @@ OMX_ERRORTYPE PortBase::SetPortDefinition(
         if (overwrite_readonly) {
             format->nStride = pformat->nStride;
             format->nSliceHeight = pformat->nSliceHeight;
+        } else {
+            format->nStride = pformat->nFrameWidth;
+            format->nSliceHeight = pformat->nFrameHeight;
         }
 
         break;
