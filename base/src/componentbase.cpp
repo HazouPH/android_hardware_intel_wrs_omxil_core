@@ -577,6 +577,9 @@ OMX_ERRORTYPE ComponentBase::CBaseSetParameter(
                 return OMX_ErrorIncorrectStateOperation;
         }
 
+        if (p->format.video.nFrameWidth > 1920 || p->format.video.nFrameHeight > 1088)
+            return OMX_ErrorUnsupportedSetting;
+
         if (index == 1 && mEnableAdaptivePlayback == OMX_TRUE) {
             if (p->format.video.nFrameWidth < mMaxFrameWidth)
                 p->format.video.nFrameWidth = mMaxFrameWidth;
