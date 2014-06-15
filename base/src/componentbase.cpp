@@ -577,9 +577,6 @@ OMX_ERRORTYPE ComponentBase::CBaseSetParameter(
                 return OMX_ErrorIncorrectStateOperation;
         }
 
-        if (p->format.video.nFrameWidth > 1920 || p->format.video.nFrameHeight > 1088)
-            return OMX_ErrorUnsupportedSetting;
-
         if (index == 1 && mEnableAdaptivePlayback == OMX_TRUE) {
             if (p->format.video.nFrameWidth < mMaxFrameWidth)
                 p->format.video.nFrameWidth = mMaxFrameWidth;
@@ -588,6 +585,9 @@ OMX_ERRORTYPE ComponentBase::CBaseSetParameter(
         }
 
         if (working_role != NULL && !strncmp((char*)working_role, "video_encoder", 13)) {
+            if (p->format.video.nFrameWidth > 2048 || p->format.video.nFrameHeight > 2048)
+                return OMX_ErrorUnsupportedSetting;
+
             if(p->format.video.eColorFormat == OMX_COLOR_FormatUnused)
                 p->nBufferSize = p->format.video.nFrameWidth * p->format.video.nFrameHeight *3/2;
         }
