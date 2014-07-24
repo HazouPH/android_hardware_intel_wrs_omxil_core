@@ -26,4 +26,5 @@ LOCAL_C_INCLUDES := \
         $(TOP)/frameworks/native/include/media/openmax \
 	$(PV_INCLUDES)
 
+LOCAL_CFLAGS += -Werror
 include $(BUILD_SHARED_LIBRARY)

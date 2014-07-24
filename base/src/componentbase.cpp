@@ -32,7 +32,7 @@
 #include <HardwareAPI.h>
 
 //#define LOG_NDEBUG 0
-
+#undef LOG_TAG
 #define LOG_TAG "componentbase"
 #include <log.h>
 
@@ -179,7 +179,7 @@ void ComponentBase::SetName(const OMX_STRING name)
     this->name[OMX_MAX_STRINGNAME_SIZE-1] = '\0';
 }
 
-const OMX_STRING ComponentBase::GetName(void)
+OMX_STRING ComponentBase::GetName(void)
 {
     return name;
 }
@@ -630,46 +630,46 @@ OMX_ERRORTYPE ComponentBase::CBaseSetParameter(
         }
         break;
     }
-    case OMX_IndexExtPrepareForAdaptivePlayback: {
-        android::PrepareForAdaptivePlaybackParams* p =
-                (android::PrepareForAdaptivePlaybackParams *)pComponentParameterStructure;
+    default:
+        if (nIndex == (OMX_INDEXTYPE)OMX_IndexExtPrepareForAdaptivePlayback) {
+            android::PrepareForAdaptivePlaybackParams* p =
+                    (android::PrepareForAdaptivePlaybackParams *)pComponentParameterStructure;
 
-        ret = CheckTypeHeader(p, sizeof(*p));
-        if (ret != OMX_ErrorNone)
-            return ret;
+            ret = CheckTypeHeader(p, sizeof(*p));
+            if (ret != OMX_ErrorNone)
+                return ret;
 
-        if (p->nPortIndex != 1)
-            return OMX_ErrorBadPortIndex;
+            if (p->nPortIndex != 1)
+                return OMX_ErrorBadPortIndex;
 
-        if (!(working_role != NULL && !strncmp((char*)working_role, "video_decoder", 13)))
-            return  OMX_ErrorBadParameter;
+            if (!(working_role != NULL && !strncmp((char*)working_role, "video_decoder", 13)))
+                return  OMX_ErrorBadParameter;
 
-        if (p->nMaxFrameWidth > kMaxAdaptiveStreamingWidth
-                || p->nMaxFrameHeight > kMaxAdaptiveStreamingHeight) {
-            LOGE("resolution %d x %d exceed max driver support %d x %d\n",p->nMaxFrameWidth, p->nMaxFrameHeight,
-                    kMaxAdaptiveStreamingWidth, kMaxAdaptiveStreamingHeight);
-            return OMX_ErrorBadParameter;
-        }
-        mEnableAdaptivePlayback = p->bEnable;
-        if (mEnableAdaptivePlayback != OMX_TRUE)
-            return OMX_ErrorBadParameter;
+            if (p->nMaxFrameWidth > kMaxAdaptiveStreamingWidth
+                    || p->nMaxFrameHeight > kMaxAdaptiveStreamingHeight) {
+                LOGE("resolution %d x %d exceed max driver support %d x %d\n",p->nMaxFrameWidth, p->nMaxFrameHeight,
+                        kMaxAdaptiveStreamingWidth, kMaxAdaptiveStreamingHeight);
+                return OMX_ErrorBadParameter;
+            }
+            mEnableAdaptivePlayback = p->bEnable;
+            if (mEnableAdaptivePlayback != OMX_TRUE)
+                return OMX_ErrorBadParameter;
 
-        mMaxFrameWidth = p->nMaxFrameWidth;
-        mMaxFrameHeight = p->nMaxFrameHeight;
-        /* update output port definition */
-        OMX_PARAM_PORTDEFINITIONTYPE paramPortDefinitionOutput;
-        if (nr_ports > p->nPortIndex && ports[p->nPortIndex]) {
-            memcpy(&paramPortDefinitionOutput,ports[p->nPortIndex]->GetPortDefinition(),
-                    sizeof(paramPortDefinitionOutput));
-            paramPortDefinitionOutput.format.video.nFrameWidth = mMaxFrameWidth;
-            paramPortDefinitionOutput.format.video.nFrameHeight = mMaxFrameHeight;
-            ports[p->nPortIndex]->SetPortDefinition(&paramPortDefinitionOutput, true);
+            mMaxFrameWidth = p->nMaxFrameWidth;
+            mMaxFrameHeight = p->nMaxFrameHeight;
+            /* update output port definition */
+            OMX_PARAM_PORTDEFINITIONTYPE paramPortDefinitionOutput;
+            if (nr_ports > p->nPortIndex && ports[p->nPortIndex]) {
+                memcpy(&paramPortDefinitionOutput,ports[p->nPortIndex]->GetPortDefinition(),
+                        sizeof(paramPortDefinitionOutput));
+                paramPortDefinitionOutput.format.video.nFrameWidth = mMaxFrameWidth;
+                paramPortDefinitionOutput.format.video.nFrameHeight = mMaxFrameHeight;
+                ports[p->nPortIndex]->SetPortDefinition(&paramPortDefinitionOutput, true);
+            }
+        } else {
+            ret = ComponentSetParameter(nIndex, pComponentParameterStructure);
         }
         break;
-    }
-
-    default:
-        ret = ComponentSetParameter(nIndex, pComponentParameterStructure);
     } /* switch */
 
     return ret;
@@ -1606,12 +1606,11 @@ out:
 inline OMX_ERRORTYPE ComponentBase::TransStateToInvalid(OMX_STATETYPE current)
 {
     OMX_ERRORTYPE ret = OMX_ErrorInvalidState;
-
+    LOGV("transit to invalid state from %d state",current);
     /*
      * Todo
      *   graceful escape
      */
-
     return ret;
 }
 
@@ -1687,7 +1686,7 @@ void ComponentBase::FlushPort(OMX_U32 port_index, bool notify)
         to_index = port_index;
     }
 
-    LOGV("%s:%s: flush ports (from index %lu to %lu)\n",
+    LOGV("%s:%s: flush ports (from index %u to %u)\n",
          GetName(), GetWorkingRole(), from_index, to_index);
 
     for (i = from_index; i <= to_index; i++) {
@@ -1721,7 +1720,7 @@ void ComponentBase::TransStatePort(OMX_U32 port_index, OMX_U8 state)
         to_index = port_index;
     }
 
-    LOGV("%s:%s: transit ports state to %s (from index %lu to %lu)\n",
+    LOGV("%s:%s: transit ports state to %s (from index %u to %u)\n",
          GetName(), GetWorkingRole(), GetPortStateName(state),
          from_index, to_index);
 
@@ -1985,8 +1984,7 @@ bool ComponentBase::IsAllBufferAvailable(void)
 }
 
 inline void ComponentBase::SourcePostProcessBuffers(
-    OMX_BUFFERHEADERTYPE ***buffers,
-    const buffer_retain_t *retain)
+    OMX_BUFFERHEADERTYPE ***buffers)
 {
     OMX_U32 i;
 
@@ -2083,9 +2081,7 @@ inline void ComponentBase::FilterPostProcessBuffers(
     }
 }
 
-inline void ComponentBase::SinkPostProcessBuffers(
-    OMX_BUFFERHEADERTYPE ***buffers,
-    const buffer_retain_t *retain)
+inline void ComponentBase::SinkPostProcessBuffers()
 {
     return;
 }
@@ -2095,11 +2091,11 @@ void ComponentBase::PostProcessBuffers(OMX_BUFFERHEADERTYPE ***buffers,
 {
 
     if (cvariant == CVARIANT_SOURCE)
-        SourcePostProcessBuffers(buffers, retain);
+        SourcePostProcessBuffers(buffers);
     else if (cvariant == CVARIANT_FILTER)
         FilterPostProcessBuffers(buffers, retain);
     else if (cvariant == CVARIANT_SINK) {
-        SinkPostProcessBuffers(buffers, retain);
+        SinkPostProcessBuffers();
     }
     else {
         LOGE("%s(): fatal error unknown component variant (%d)\n",
@@ -2143,37 +2139,35 @@ OMX_ERRORTYPE ComponentBase::ProcessorResume(void)
     return OMX_ErrorNone;
 }
 
-OMX_ERRORTYPE ComponentBase::ProcessorFlush(OMX_U32 port_index)
+OMX_ERRORTYPE ComponentBase::ProcessorFlush(OMX_U32)
+{
+    return OMX_ErrorNone;
+}
+OMX_ERRORTYPE ComponentBase::ProcessorPreFillBuffer(OMX_BUFFERHEADERTYPE*)
 {
     return OMX_ErrorNone;
 }
 
-OMX_ERRORTYPE ComponentBase::ProcessorPreFillBuffer(OMX_BUFFERHEADERTYPE* buffer)
+OMX_ERRORTYPE ComponentBase::ProcessorPreEmptyBuffer(OMX_BUFFERHEADERTYPE*)
 {
     return OMX_ErrorNone;
 }
-
-OMX_ERRORTYPE ComponentBase::ProcessorPreEmptyBuffer(OMX_BUFFERHEADERTYPE* buffer)
-{
-    return OMX_ErrorNone;
-}
-
-OMX_ERRORTYPE ComponentBase::ProcessorProcess(OMX_BUFFERHEADERTYPE **pBuffers,
-                                           buffer_retain_t *retain,
-                                           OMX_U32 nr_buffers)
+OMX_ERRORTYPE ComponentBase::ProcessorProcess(OMX_BUFFERHEADERTYPE **,
+                                           buffer_retain_t *,
+                                           OMX_U32)
 {
     LOGE("ProcessorProcess not be implemented");
     return OMX_ErrorNotImplemented;
 }
-OMX_ERRORTYPE ComponentBase::ProcessorProcess(OMX_BUFFERHEADERTYPE ***pBuffers,
-                                           buffer_retain_t *retain,
-                                           OMX_U32 nr_buffers)
+OMX_ERRORTYPE ComponentBase::ProcessorProcess(OMX_BUFFERHEADERTYPE ***,
+                                           buffer_retain_t *,
+                                           OMX_U32)
 {
     LOGE("ProcessorProcess not be implemented");
     return OMX_ErrorNotImplemented;
 }
 
-OMX_ERRORTYPE ComponentBase::ProcessorPreFreeBuffer(OMX_U32 nPortIndex, OMX_BUFFERHEADERTYPE* pBuffer)
+OMX_ERRORTYPE ComponentBase::ProcessorPreFreeBuffer(OMX_U32, OMX_BUFFERHEADERTYPE*)
 {
     return OMX_ErrorNone;
 
@@ -2181,7 +2175,7 @@ OMX_ERRORTYPE ComponentBase::ProcessorPreFreeBuffer(OMX_U32 nPortIndex, OMX_BUFF
 /* end of processor callbacks */
 
 /* helper for derived class */
-const OMX_STRING ComponentBase::GetWorkingRole(void)
+OMX_STRING ComponentBase::GetWorkingRole(void)
 {
     return &working_role[0];
 }

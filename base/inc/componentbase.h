@@ -87,10 +87,10 @@ public:
      */
     /* name */
     void SetName(const OMX_STRING name);
-    const OMX_STRING GetName(void);
+    OMX_STRING GetName(void);
 
     /* working role */
-    const OMX_STRING GetWorkingRole(void);
+    OMX_STRING GetWorkingRole(void);
 
     /* cmodule */
     void SetCModule(CModule *cmodule);
@@ -361,12 +361,10 @@ private:
     /* called in Work() after ProcessorProcess() */
     void PostProcessBuffers(OMX_BUFFERHEADERTYPE ***buffers,
                             const buffer_retain_t *retain);
-    void SourcePostProcessBuffers(OMX_BUFFERHEADERTYPE ***buffers,
-                                  const buffer_retain_t *retain);
+    void SourcePostProcessBuffers(OMX_BUFFERHEADERTYPE ***buffers);
     void FilterPostProcessBuffers(OMX_BUFFERHEADERTYPE ***buffers,
                                   const buffer_retain_t *retain);
-    void SinkPostProcessBuffers(OMX_BUFFERHEADERTYPE ***buffers,
-                                const buffer_retain_t *retain);
+    void SinkPostProcessBuffers();
 
     /* processor callbacks */
     /* TransState */

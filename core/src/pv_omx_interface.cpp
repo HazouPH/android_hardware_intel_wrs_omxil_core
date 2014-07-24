@@ -65,7 +65,6 @@ class PVOMXInterface : public OMXInterface
             pOMX_FreeHandle = OMX_FreeHandle;
             pOMX_GetComponentsOfRole = OMX_GetComponentsOfRole;
             pOMX_GetRolesOfComponent = OMX_GetRolesOfComponent;
-            pOMX_SetupTunnel = OMX_SetupTunnel;
             pOMX_GetContentPipe = OMX_GetContentPipe;
             pOMXConfigParser = Intel_OMXConfigParser; 
         };

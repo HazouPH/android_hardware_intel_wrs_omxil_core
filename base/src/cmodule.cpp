@@ -118,12 +118,12 @@ OMX_U32 CModule::Unload(void)
 /*
  * accessor
  */
-const OMX_STRING CModule::GetLibraryName(void)
+OMX_STRING CModule::GetLibraryName(void)
 {
     return lname;
 }
 
-const OMX_STRING CModule::GetComponentName(void)
+OMX_STRING CModule::GetComponentName(void)
 {
     return cname;
 }

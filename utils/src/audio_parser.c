@@ -326,9 +326,7 @@ static inline int mp3_calculate_frame_length(int bitrate, int samplingrate,
  * FIXME
  *   - It's hard coded for version 1, layer 3
  */
-static inline int mp3_calculate_frame_duration(int version,
-                                               int layer,
-                                               int frequency)
+static inline int mp3_calculate_frame_duration(int frequency)
 {
     return 1152 * 1000 / frequency;
 }
@@ -400,8 +398,7 @@ int mp3_header_parse(const unsigned char *buffer,
     *mode_extension = header.mode_extension;
     *frame_length = mp3_calculate_frame_length(*bitrate, *frequency,
                                                *layer, header.padding_bit);
-    *frame_duration = mp3_calculate_frame_duration(*version, *layer,
-                                                   *frequency);
+    *frame_duration = mp3_calculate_frame_duration(*frequency);
 
     LOGV("mp3 frame header\n");
     LOGV("  sync: 0x%x\n", header.sync);

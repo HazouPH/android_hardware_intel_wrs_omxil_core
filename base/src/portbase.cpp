@@ -24,7 +24,6 @@
 
 #include <portbase.h>
 #include <componentbase.h>
-#include <OMX_VideoExt.h>
 //#define LOG_NDEBUG 0
 
 #define LOG_TAG "portbase"
@@ -261,7 +260,7 @@ OMX_ERRORTYPE PortBase::SetPortDefinition(
         format->eCompressionFormat = pformat->eCompressionFormat;
         format->eColorFormat = pformat->eColorFormat;
         format->pNativeWindow = pformat->pNativeWindow;
-        OMX_U32 nFrameSize = getFrameBufSize(format->eColorFormat,format->nFrameWidth,format->nFrameHeight);
+        OMX_S32 nFrameSize = getFrameBufSize(format->eColorFormat,format->nFrameWidth,format->nFrameHeight);
         if(nFrameSize!=-1)
             temp.nBufferSize = nFrameSize;
         if (overwrite_readonly) {
@@ -329,14 +328,14 @@ OMX_ERRORTYPE PortBase::UseBuffer(OMX_BUFFERHEADERTYPE **ppBufferHdr,
     OMX_BUFFERHEADERTYPE *buffer_hdr;
     struct list *entry;
 
-    LOGV("%s(): %s:%s:PortIndex %lu: enter, nSizeBytes=%lu\n", __FUNCTION__,
+    LOGV("%s(): %s:%s:PortIndex %u: enter, nSizeBytes=%u\n", __FUNCTION__,
          cbase->GetName(), cbase->GetWorkingRole(), nPortIndex, nSizeBytes);
 
     pthread_mutex_lock(&hdrs_lock);
 
     if (portdefinition.bPopulated == OMX_TRUE) {
         pthread_mutex_unlock(&hdrs_lock);
-        LOGV("%s(): %s:%s:PortIndex %lu: exit done, already populated\n",
+        LOGV("%s(): %s:%s:PortIndex %u: exit done, already populated\n",
              __FUNCTION__, cbase->GetName(), cbase->GetWorkingRole(),
              nPortIndex);
         return OMX_ErrorNone;
@@ -345,7 +344,7 @@ OMX_ERRORTYPE PortBase::UseBuffer(OMX_BUFFERHEADERTYPE **ppBufferHdr,
     buffer_hdr = (OMX_BUFFERHEADERTYPE *)calloc(1, sizeof(*buffer_hdr));
     if (!buffer_hdr) {
         pthread_mutex_unlock(&hdrs_lock);
-        LOGE("%s(): %s:%s:PortIndex %lu: exit failure, "
+        LOGE("%s(): %s:%s:PortIndex %u: exit failure, "
              "connot allocate buffer header\n", __FUNCTION__,
              cbase->GetName(), cbase->GetWorkingRole(), nPortIndex);
         return OMX_ErrorInsufficientResources;
@@ -355,7 +354,7 @@ OMX_ERRORTYPE PortBase::UseBuffer(OMX_BUFFERHEADERTYPE **ppBufferHdr,
     if (!entry) {
         free(buffer_hdr);
         pthread_mutex_unlock(&hdrs_lock);
-        LOGE("%s(): %s:%s:PortIndex %lu: exit failure, "
+        LOGE("%s(): %s:%s:PortIndex %u: exit failure, "
              "cannot allocate list entry\n", __FUNCTION__,
              cbase->GetName(), cbase->GetWorkingRole(), nPortIndex);
         return OMX_ErrorInsufficientResources;
@@ -379,7 +378,7 @@ OMX_ERRORTYPE PortBase::UseBuffer(OMX_BUFFERHEADERTYPE **ppBufferHdr,
     buffer_hdrs = __list_add_tail(buffer_hdrs, entry);
     nr_buffer_hdrs++;
 
-    LOGV("%s(): %s:%s:PortIndex %lu: a buffer allocated (%p:%lu/%lu)\n",
+    LOGV("%s(): %s:%s:PortIndex %u: a buffer allocated (%p:%u/%u)\n",
          __FUNCTION__,
          cbase->GetName(), cbase->GetWorkingRole(), nPortIndex,
          buffer_hdr, nr_buffer_hdrs, portdefinition.nBufferCountActual);
@@ -388,7 +387,7 @@ OMX_ERRORTYPE PortBase::UseBuffer(OMX_BUFFERHEADERTYPE **ppBufferHdr,
         portdefinition.bPopulated = OMX_TRUE;
         buffer_hdrs_completion = true;
         pthread_cond_signal(&hdrs_wait);
-        LOGV("%s(): %s:%s:PortIndex %lu: allocate all buffers (%lu)\n",
+        LOGV("%s(): %s:%s:PortIndex %u: allocate all buffers (%u)\n",
              __FUNCTION__, cbase->GetName(), cbase->GetWorkingRole(),
              nPortIndex, portdefinition.nBufferCountActual);
     }
@@ -397,7 +396,7 @@ OMX_ERRORTYPE PortBase::UseBuffer(OMX_BUFFERHEADERTYPE **ppBufferHdr,
 
     pthread_mutex_unlock(&hdrs_lock);
 
-    LOGV("%s(): %s:%s:PortIndex %lu: exit done\n", __FUNCTION__,
+    LOGV("%s(): %s:%s:PortIndex %u: exit done\n", __FUNCTION__,
          cbase->GetName(), cbase->GetWorkingRole(), nPortIndex);
     return OMX_ErrorNone;
 }
@@ -410,13 +409,13 @@ OMX_ERRORTYPE PortBase:: AllocateBuffer(OMX_BUFFERHEADERTYPE **ppBuffer,
     OMX_BUFFERHEADERTYPE *buffer_hdr;
     struct list *entry;
 
-    LOGV("%s(): %s:%s:PortIndex %lu: enter, nSizeBytes=%lu\n", __FUNCTION__,
+    LOGV("%s(): %s:%s:PortIndex %u: enter, nSizeBytes=%u\n", __FUNCTION__,
          cbase->GetName(), cbase->GetWorkingRole(), nPortIndex, nSizeBytes);
 
     pthread_mutex_lock(&hdrs_lock);
     if (portdefinition.bPopulated == OMX_TRUE) {
         pthread_mutex_unlock(&hdrs_lock);
-        LOGV("%s(): %s:%s:PortIndex %lu: exit done, already populated\n",
+        LOGV("%s(): %s:%s:PortIndex %u: exit done, already populated\n",
              __FUNCTION__, cbase->GetName(), cbase->GetWorkingRole(),
              nPortIndex);
         return OMX_ErrorNone;
@@ -433,7 +432,7 @@ OMX_ERRORTYPE PortBase:: AllocateBuffer(OMX_BUFFERHEADERTYPE **ppBuffer,
 
     if (!buffer_hdr) {
         pthread_mutex_unlock(&hdrs_lock);
-        LOGE("%s(): %s:%s:PortIndex %lu: exit failure, "
+        LOGE("%s(): %s:%s:PortIndex %u: exit failure, "
              "connot allocate buffer header\n", __FUNCTION__,
              cbase->GetName(), cbase->GetWorkingRole(), nPortIndex);
         return OMX_ErrorInsufficientResources;
@@ -443,7 +442,7 @@ OMX_ERRORTYPE PortBase:: AllocateBuffer(OMX_BUFFERHEADERTYPE **ppBuffer,
     if (!entry) {
         free(buffer_hdr);
         pthread_mutex_unlock(&hdrs_lock);
-        LOGE("%s(): %s:%s:PortIndex %lu: exit failure, "
+        LOGE("%s(): %s:%s:PortIndex %u: exit failure, "
              "connot allocate list entry\n", __FUNCTION__,
              cbase->GetName(), cbase->GetWorkingRole(), nPortIndex);
         return OMX_ErrorInsufficientResources;
@@ -478,7 +477,7 @@ OMX_ERRORTYPE PortBase:: AllocateBuffer(OMX_BUFFERHEADERTYPE **ppBuffer,
     buffer_hdrs = __list_add_tail(buffer_hdrs, entry);
     nr_buffer_hdrs++;
 
-    LOGV("%s(): %s:%s:PortIndex %lu: a buffer allocated (%p:%lu/%lu)\n",
+    LOGV("%s(): %s:%s:PortIndex %u: a buffer allocated (%p:%u/%u)\n",
          __FUNCTION__,
          cbase->GetName(), cbase->GetWorkingRole(), nPortIndex,
          buffer_hdr, nr_buffer_hdrs, portdefinition.nBufferCountActual);
@@ -487,7 +486,7 @@ OMX_ERRORTYPE PortBase:: AllocateBuffer(OMX_BUFFERHEADERTYPE **ppBuffer,
         portdefinition.bPopulated = OMX_TRUE;
         buffer_hdrs_completion = true;
         pthread_cond_signal(&hdrs_wait);
-        LOGV("%s(): %s:%s:PortIndex %lu: allocate all buffers (%lu)\n",
+        LOGV("%s(): %s:%s:PortIndex %u: allocate all buffers (%u)\n",
              __FUNCTION__, cbase->GetName(), cbase->GetWorkingRole(),
              nPortIndex, portdefinition.nBufferCountActual);
     }
@@ -496,7 +495,7 @@ OMX_ERRORTYPE PortBase:: AllocateBuffer(OMX_BUFFERHEADERTYPE **ppBuffer,
 
     pthread_mutex_unlock(&hdrs_lock);
 
-    LOGV("%s(): %s:%s:PortIndex %lu: exit done\n", __FUNCTION__,
+    LOGV("%s(): %s:%s:PortIndex %u: exit done\n", __FUNCTION__,
          cbase->GetName(), cbase->GetWorkingRole(), nPortIndex);
     return OMX_ErrorNone;
 }
@@ -507,7 +506,7 @@ OMX_ERRORTYPE PortBase::FreeBuffer(OMX_U32 nPortIndex,
     struct list *entry;
     OMX_ERRORTYPE ret;
 
-    LOGV("%s(): %s:%s:PortIndex %lu:pBuffer %p: enter\n", __FUNCTION__,
+    LOGV("%s(): %s:%s:PortIndex %u:pBuffer %p: enter\n", __FUNCTION__,
          cbase->GetName(), cbase->GetWorkingRole(), nPortIndex, pBuffer);
 
     pthread_mutex_lock(&hdrs_lock);
@@ -515,7 +514,7 @@ OMX_ERRORTYPE PortBase::FreeBuffer(OMX_U32 nPortIndex,
 
     if (!entry) {
         pthread_mutex_unlock(&hdrs_lock);
-        LOGE("%s(): %s:%s:PortIndex %lu:pBuffer %p: exit failure, "
+        LOGE("%s(): %s:%s:PortIndex %u:pBuffer %p: exit failure, "
              "cannot find list entry for pBuffer\n", __FUNCTION__,
              cbase->GetName(), cbase->GetWorkingRole(), nPortIndex, pBuffer);
         return OMX_ErrorBadParameter;
@@ -523,7 +522,7 @@ OMX_ERRORTYPE PortBase::FreeBuffer(OMX_U32 nPortIndex,
 
     if (entry->data != pBuffer) {
         pthread_mutex_unlock(&hdrs_lock);
-        LOGE("%s(): %s:%s:PortIndex %lu:pBuffer %p: exit failure,"
+        LOGE("%s(): %s:%s:PortIndex %u:pBuffer %p: exit failure,"
              "mismatch list entry\n" , __FUNCTION__,
              cbase->GetName(), cbase->GetWorkingRole(), nPortIndex, pBuffer);
         return OMX_ErrorBadParameter;
@@ -532,7 +531,7 @@ OMX_ERRORTYPE PortBase::FreeBuffer(OMX_U32 nPortIndex,
     ret = ComponentBase::CheckTypeHeader(pBuffer, sizeof(*pBuffer));
     if (ret != OMX_ErrorNone) {
         pthread_mutex_unlock(&hdrs_lock);
-        LOGE("%s(): %s:%s:PortIndex %lu:pBuffer %p: exit failure,"
+        LOGE("%s(): %s:%s:PortIndex %u:pBuffer %p: exit failure,"
              "invalid type header\n", __FUNCTION__,
              cbase->GetName(), cbase->GetWorkingRole(), nPortIndex, pBuffer);
         return ret;
@@ -541,7 +540,7 @@ OMX_ERRORTYPE PortBase::FreeBuffer(OMX_U32 nPortIndex,
     buffer_hdrs = __list_delete(buffer_hdrs, entry);
     nr_buffer_hdrs--;
 
-    LOGV("%s(): %s:%s:PortIndex %lu:pBuffer %p: free a buffer (%lu/%lu)\n",
+    LOGV("%s(): %s:%s:PortIndex %u:pBuffer %p: free a buffer (%u/%u)\n",
          __FUNCTION__, cbase->GetName(), cbase->GetWorkingRole(), nPortIndex,
          pBuffer, nr_buffer_hdrs, portdefinition.nBufferCountActual);
     if (custom_mem_free) {
@@ -554,14 +553,14 @@ OMX_ERRORTYPE PortBase::FreeBuffer(OMX_U32 nPortIndex,
     if (!nr_buffer_hdrs) {
         buffer_hdrs_completion = true;
         pthread_cond_signal(&hdrs_wait);
-        LOGV("%s(): %s:%s:PortIndex %lu: free all allocated buffers (%lu)\n",
+        LOGV("%s(): %s:%s:PortIndex %u: free all allocated buffers (%u)\n",
              __FUNCTION__, cbase->GetName(), cbase->GetWorkingRole(),
              nPortIndex, portdefinition.nBufferCountActual);
     }
 
     pthread_mutex_unlock(&hdrs_lock);
 
-    LOGV("%s(): %s:%s:PortIndex %lu: exit done\n", __FUNCTION__,
+    LOGV("%s(): %s:%s:PortIndex %u: exit done\n", __FUNCTION__,
          cbase->GetName(), cbase->GetWorkingRole(), nPortIndex);
     return OMX_ErrorNone;
 }
@@ -570,11 +569,11 @@ void PortBase::WaitPortBufferCompletion(void)
 {
     pthread_mutex_lock(&hdrs_lock);
     if (!buffer_hdrs_completion) {
-        LOGV("%s(): %s:%s:PortIndex %lu: wait for buffer header completion\n",
+        LOGV("%s(): %s:%s:PortIndex %u: wait for buffer header completion\n",
              __FUNCTION__, cbase->GetName(), cbase->GetWorkingRole(),
              portdefinition.nPortIndex);
         pthread_cond_wait(&hdrs_wait, &hdrs_lock);
-        LOGV("%s(): %s:%s:PortIndex %lu: wokeup (buffer header completion)\n",
+        LOGV("%s(): %s:%s:PortIndex %u: wokeup (buffer header completion)\n",
              __FUNCTION__, cbase->GetName(), cbase->GetWorkingRole(),
              portdefinition.nPortIndex);
     }
@@ -588,7 +587,7 @@ OMX_ERRORTYPE PortBase::WaitPortBufferCompletionTimeout(int64_t milliseconds)
     OMX_ERRORTYPE ret = OMX_ErrorNone;
     pthread_mutex_lock(&hdrs_lock);
     if (!buffer_hdrs_completion) {
-        LOGV("%s(): %s:%s:PortIndex %lu: wait for buffer header completion\n",
+        LOGV("%s(): %s:%s:PortIndex %u: wait for buffer header completion\n",
              __FUNCTION__, cbase->GetName(), cbase->GetWorkingRole(),
              portdefinition.nPortIndex);
         struct timespec tv;
@@ -598,7 +597,7 @@ OMX_ERRORTYPE PortBase::WaitPortBufferCompletionTimeout(int64_t milliseconds)
         rc = pthread_cond_timedwait(&hdrs_wait, &hdrs_lock, &tv);
     }
     if (rc == ETIMEDOUT) {
-        LOGE("%s(): %s:%s:PortIndex %lu: wokeup (buffer header timeout)\n",
+        LOGE("%s(): %s:%s:PortIndex %u: wokeup (buffer header timeout)\n",
              __FUNCTION__, cbase->GetName(), cbase->GetWorkingRole(),
              portdefinition.nPortIndex);
         ret = OMX_ErrorTimeout;
@@ -612,11 +611,9 @@ OMX_ERRORTYPE PortBase::WaitPortBufferCompletionTimeout(int64_t milliseconds)
 OMX_ERRORTYPE PortBase::PushThisBuffer(OMX_BUFFERHEADERTYPE *pBuffer)
 {
     int ret;
-
-    LOGV_IF(pBuffer != NULL, "%s(): %s:%s:PortIndex %lu:pBuffer %p:\n",
+    LOGV_IF(pBuffer != NULL, "%s(): %s:%s:PortIndex %u:pBuffer %p:\n",
             __FUNCTION__, cbase->GetName(), cbase->GetWorkingRole(),
-            portdefinition.nPortIndex, pBuffer);
-
+           portdefinition.nPortIndex, pBuffer);
     pthread_mutex_lock(&bufferq_lock);
     ret = queue_push_tail(&bufferq, pBuffer);
     pthread_mutex_unlock(&bufferq_lock);
@@ -634,11 +631,9 @@ OMX_BUFFERHEADERTYPE *PortBase::PopBuffer(void)
     pthread_mutex_lock(&bufferq_lock);
     buffer = (OMX_BUFFERHEADERTYPE *)queue_pop_head(&bufferq);
     pthread_mutex_unlock(&bufferq_lock);
-
-    LOGV_IF((buffer != NULL || RetainedBufferQueueLength() > 0), "%s(): %s:%s:PortIndex %lu:pBuffer %p:\n",
+    LOGV_IF((buffer != NULL || RetainedBufferQueueLength() > 0), "%s(): %s:%s:PortIndex %u:pBuffer %p:\n",
             __FUNCTION__, cbase->GetName(), cbase->GetWorkingRole(),
             portdefinition.nPortIndex, buffer);
-
     return buffer;
 }
 
@@ -673,12 +668,12 @@ OMX_ERRORTYPE PortBase::ReturnThisBuffer(OMX_BUFFERHEADERTYPE *pBuffer)
                                          OMX_BUFFERHEADERTYPE *);
     OMX_ERRORTYPE ret;
 
-    LOGV("%s(): %s:%s:PortIndex %lu:pBuffer %p: enter\n", __FUNCTION__,
+    LOGV("%s(): %s:%s:PortIndex %u:pBuffer %p: enter\n", __FUNCTION__,
          cbase->GetName(), cbase->GetWorkingRole(), portdefinition.nPortIndex,
          pBuffer);
 
     if (!pBuffer) {
-        LOGE("%s(): %s:%s:PortIndex %lu:pBuffer %p: exit failure, "
+        LOGE("%s(): %s:%s:PortIndex %u:pBuffer %p: exit failure, "
              "invalid buffer pointer\n",
              __FUNCTION__, cbase->GetName(), cbase->GetWorkingRole(),
              portdefinition.nPortIndex, pBuffer);
@@ -694,7 +689,7 @@ OMX_ERRORTYPE PortBase::ReturnThisBuffer(OMX_BUFFERHEADERTYPE *pBuffer)
         bufferdone_callback = callbacks->FillBufferDone;
     }
     else {
-        LOGE("%s(): %s:%s:PortIndex %lu:pBuffer %p: exit failure, "
+        LOGE("%s(): %s:%s:PortIndex %u:pBuffer %p: exit failure, "
              "invalid direction (%d)\n",
              __FUNCTION__, cbase->GetName(), cbase->GetWorkingRole(),
              portdefinition.nPortIndex, pBuffer,
@@ -703,15 +698,15 @@ OMX_ERRORTYPE PortBase::ReturnThisBuffer(OMX_BUFFERHEADERTYPE *pBuffer)
     }
 
     if (port_index != portdefinition.nPortIndex) {
-        LOGE("%s(): %s:%s:PortIndex %lu:pBuffer %p: exit failure, "
-             "invalid port index (%lu)\n", __FUNCTION__,
+        LOGE("%s(): %s:%s:PortIndex %u:pBuffer %p: exit failure, "
+             "invalid port index (%u)\n", __FUNCTION__,
              cbase->GetName(), cbase->GetWorkingRole(),
              portdefinition.nPortIndex, pBuffer, port_index);
         return OMX_ErrorBadParameter;
     }
 
     if (pBuffer->nFlags & OMX_BUFFERFLAG_EOS) {
-        LOGV("%s(): %s:%s:PortIndex %lu:pBuffer %p: "
+        LOGV("%s(): %s:%s:PortIndex %u:pBuffer %p: "
              "Report OMX_EventBufferFlag (OMX_BUFFERFLAG_EOS)\n",
              __FUNCTION__, cbase->GetName(), cbase->GetWorkingRole(),
              portdefinition.nPortIndex, pBuffer);
@@ -722,7 +717,7 @@ OMX_ERRORTYPE PortBase::ReturnThisBuffer(OMX_BUFFERHEADERTYPE *pBuffer)
     }
 
     if (pBuffer->hMarkTargetComponent == owner) {
-        LOGV("%s(): %s:%s:PortIndex %lu:pBuffer %p: "
+        LOGV("%s(): %s:%s:PortIndex %u:pBuffer %p: "
              "Report OMX_EventMark\n",
              __FUNCTION__, cbase->GetName(), cbase->GetWorkingRole(),
              portdefinition.nPortIndex, pBuffer);
@@ -735,7 +730,7 @@ OMX_ERRORTYPE PortBase::ReturnThisBuffer(OMX_BUFFERHEADERTYPE *pBuffer)
 
     ret = bufferdone_callback(owner, appdata, pBuffer);
 
-    LOGV("%s(): %s:%s:PortIndex %lu: exit done, "
+    LOGV("%s(): %s:%s:PortIndex %u: exit done, "
          "callback returned (0x%08x)\n", __FUNCTION__,
          cbase->GetName(), cbase->GetWorkingRole(), portdefinition.nPortIndex,
          ret);
@@ -778,7 +773,7 @@ OMX_ERRORTYPE PortBase::RetainThisBuffer(OMX_BUFFERHEADERTYPE *pBuffer,
 {
     int ret;
 
-    LOGV("%s(): %s:%s:PortIndex %lu:pBuffer %p: enter, %s\n", __FUNCTION__,
+    LOGV("%s(): %s:%s:PortIndex %u:pBuffer %p: enter, %s\n", __FUNCTION__,
          cbase->GetName(), cbase->GetWorkingRole(), portdefinition.nPortIndex,
          pBuffer, (accumulate == true) ? "accumulate" : "getagain");
 
@@ -788,7 +783,7 @@ OMX_ERRORTYPE PortBase::RetainThisBuffer(OMX_BUFFERHEADERTYPE *pBuffer,
         if (cbase->GetWorkingRole() == NULL || (strncmp((char*)cbase->GetWorkingRole(), "video_encoder", 13) != 0)) {
             /* do not accumulate a buffer set EOS flag if not video encoder*/
             if (pBuffer->nFlags & OMX_BUFFERFLAG_EOS) {
-                LOGE("%s(): %s:%s:PortIndex %lu:pBuffer %p: exit failure, "
+                LOGE("%s(): %s:%s:PortIndex %u:pBuffer %p: exit failure, "
                      "cannot accumulate EOS buffer\n", __FUNCTION__,
                      cbase->GetName(), cbase->GetWorkingRole(),
                      portdefinition.nPortIndex, pBuffer);
@@ -802,9 +797,9 @@ OMX_ERRORTYPE PortBase::RetainThisBuffer(OMX_BUFFERHEADERTYPE *pBuffer,
             ret = queue_push_tail(&retainedbufferq, pBuffer);
         else {
             ret = OMX_ErrorInsufficientResources;
-            LOGE("%s(): %s:%s:PortIndex %lu:pBuffer %p: exit failure, "
+            LOGE("%s(): %s:%s:PortIndex %u:pBuffer %p: exit failure, "
                  "retained bufferq length (%d) exceeds port's actual count "
-                 "(%lu)\n", __FUNCTION__,
+                 "(%u)\n", __FUNCTION__,
                  cbase->GetName(), cbase->GetWorkingRole(),
                  portdefinition.nPortIndex, pBuffer,
                  queue_length(&retainedbufferq),
@@ -825,7 +820,7 @@ OMX_ERRORTYPE PortBase::RetainThisBuffer(OMX_BUFFERHEADERTYPE *pBuffer,
     if (ret)
         return OMX_ErrorInsufficientResources;
 
-    LOGV("%s(): %s:%s:PortIndex %lu:pBuffer %p: exit done\n", __FUNCTION__,
+    LOGV("%s(): %s:%s:PortIndex %u:pBuffer %p: exit done\n", __FUNCTION__,
          cbase->GetName(), cbase->GetWorkingRole(),
          portdefinition.nPortIndex, pBuffer);
     return OMX_ErrorNone;
@@ -843,14 +838,14 @@ void PortBase::ReturnAllRetainedBuffers(void)
         buffer = (OMX_BUFFERHEADERTYPE *)queue_pop_head(&retainedbufferq);
 
         if (buffer) {
-            LOGV("%s(): %s:%s:PortIndex %lu: returns a retained buffer "
+            LOGV("%s(): %s:%s:PortIndex %u: returns a retained buffer "
                  "(%p:%d/%d)\n", __FUNCTION__, cbase->GetName(),
                  cbase->GetWorkingRole(), portdefinition.nPortIndex,
                  buffer, i++, queue_length(&retainedbufferq));
 
             ret = ReturnThisBuffer(buffer);
             if (ret != OMX_ErrorNone)
-                LOGE("%s(): %s:%s:PortIndex %lu: failed (ret : 0x%x08x)\n",
+                LOGE("%s(): %s:%s:PortIndex %u: failed (ret : 0x%x08x)\n",
                      __FUNCTION__,
                      cbase->GetName(), cbase->GetWorkingRole(),
                      portdefinition.nPortIndex, ret);
@@ -858,9 +853,8 @@ void PortBase::ReturnAllRetainedBuffers(void)
     } while (buffer);
 
     pthread_mutex_unlock(&retainedbufferq_lock);
-
     LOGV_IF(i != 0,
-            "%s(): %s:%s:PortIndex %lu: returned all retained buffers (%d)\n",
+            "%s(): %s:%s:PortIndex %u: returned all retained buffers (%d)\n",
             __FUNCTION__, cbase->GetName(), cbase->GetWorkingRole(),
             portdefinition.nPortIndex, i);
 }
@@ -876,14 +870,14 @@ void PortBase::ReturnOneRetainedBuffer(void)
     buffer = (OMX_BUFFERHEADERTYPE *)queue_pop_head(&retainedbufferq);
 
     if (buffer) {
-        LOGV("%s(): %s:%s:PortIndex %lu: returns a retained buffer "
+        LOGV("%s(): %s:%s:PortIndex %u: returns a retained buffer "
              "(%p:%d/%d)\n", __FUNCTION__, cbase->GetName(),
              cbase->GetWorkingRole(), portdefinition.nPortIndex,
              buffer, i++, queue_length(&retainedbufferq));
 
         ret = ReturnThisBuffer(buffer);
         if (ret != OMX_ErrorNone)
-            LOGE("%s(): %s:%s:PortIndex %lu: failed (ret : 0x%x08x)\n",
+            LOGE("%s(): %s:%s:PortIndex %u: failed (ret : 0x%x08x)\n",
                  __FUNCTION__,
                  cbase->GetName(), cbase->GetWorkingRole(),
                  portdefinition.nPortIndex, ret);
@@ -899,7 +893,7 @@ OMX_ERRORTYPE PortBase::FlushPort(void)
 {
     OMX_BUFFERHEADERTYPE *buffer;
 
-    LOGV("%s(): %s:%s:PortIndex %lu: enter\n", __FUNCTION__,
+    LOGV("%s(): %s:%s:PortIndex %u: enter\n", __FUNCTION__,
          cbase->GetName(), cbase->GetWorkingRole(),
          portdefinition.nPortIndex);
 
@@ -908,7 +902,7 @@ OMX_ERRORTYPE PortBase::FlushPort(void)
     while ((buffer = PopBuffer()))
         ReturnThisBuffer(buffer);
 
-    LOGV("%s(): %s:%s:PortIndex %lu: exit\n", __FUNCTION__,
+    LOGV("%s(): %s:%s:PortIndex %u: exit\n", __FUNCTION__,
          cbase->GetName(), cbase->GetWorkingRole(),
          portdefinition.nPortIndex);
 
@@ -1001,7 +995,7 @@ OMX_ERRORTYPE PortBase::TransState(OMX_U8 transition)
     OMX_U8 current;
     OMX_ERRORTYPE ret = OMX_ErrorNone;
 
-    LOGV("%s(): %s:%s:PortIndex %lu: enter, transition from %s to %s\n",
+    LOGV("%s(): %s:%s:PortIndex %u: enter, transition from %s to %s\n",
          __FUNCTION__,
          cbase->GetName(), cbase->GetWorkingRole(), portdefinition.nPortIndex,
          GetPortStateName(state), GetPortStateName(transition));
@@ -1012,7 +1006,7 @@ OMX_ERRORTYPE PortBase::TransState(OMX_U8 transition)
 
     if (current == transition) {
         ret = OMX_ErrorSameState;
-        LOGE("%s(): %s:%s:PortIndex %lu: exit failure, same state (%s)\n",
+        LOGE("%s(): %s:%s:PortIndex %u: exit failure, same state (%s)\n",
              __FUNCTION__,
              cbase->GetName(), cbase->GetWorkingRole(),
              portdefinition.nPortIndex, GetPortStateName(current));
@@ -1046,7 +1040,7 @@ OMX_ERRORTYPE PortBase::TransState(OMX_U8 transition)
     }
     else {
         ret = OMX_ErrorBadParameter;
-        LOGE("%s(): %s:%s:PortIndex %lu: exit failure, invalid transition "
+        LOGE("%s(): %s:%s:PortIndex %u: exit failure, invalid transition "
              "(%s)\n", __FUNCTION__,
              cbase->GetName(), cbase->GetWorkingRole(),
              portdefinition.nPortIndex, GetPortStateName(transition));
@@ -1055,7 +1049,7 @@ OMX_ERRORTYPE PortBase::TransState(OMX_U8 transition)
 
     state = transition;
 
-    LOGV("%s(): %s:%s:PortIndex %lu: transition from %s to %s complete\n",
+    LOGV("%s(): %s:%s:PortIndex %u: transition from %s to %s complete\n",
          __FUNCTION__,
          cbase->GetName(), cbase->GetWorkingRole(), portdefinition.nPortIndex,
          GetPortStateName(current), GetPortStateName(state));

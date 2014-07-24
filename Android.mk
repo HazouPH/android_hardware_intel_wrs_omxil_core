@@ -47,4 +47,5 @@ COMPONENT_SUPPORT_OPENCORE := false
 # utility
 -include $(WRS_OMXIL_CORE_ROOT)/utils/src/Android.mk
 
+LOCAL_CFLAGS += -Werror
 endif

@@ -59,10 +59,10 @@ class CModule {
      * accessor
      */
     /* library name */
-    const OMX_STRING GetLibraryName(void);
+    OMX_STRING GetLibraryName(void);
 
     /* component name and roles */
-    const OMX_STRING GetComponentName(void);
+    OMX_STRING GetComponentName(void);
     OMX_ERRORTYPE GetComponentRoles(OMX_U32 *nr_roles, OMX_U8 **roles);
 
     bool QueryHavingThisRole(const OMX_STRING role);

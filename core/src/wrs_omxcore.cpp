@@ -186,7 +186,7 @@ OMX_API OMX_ERRORTYPE OMX_APIENTRY OMX_ComponentNameEnum(
 
     strncpy(cComponentName, cname, nNameLength);
 
-    LOGV("%s(): found %luth component %s", __FUNCTION__, nIndex, cname);
+    LOGV("%s(): found %u th component %s", __FUNCTION__, nIndex, cname);
     return OMX_ErrorNone;
 }
 
@@ -305,22 +305,6 @@ OMX_API OMX_ERRORTYPE OMX_APIENTRY OMX_FreeHandle(
     LOGI("free handle of component %s successfully", cname);
     LOGV("%s(): exit done", __FUNCTION__);
     return OMX_ErrorNone;
-}
-
-OMX_API OMX_ERRORTYPE OMX_APIENTRY OMX_SetupTunnel(
-    OMX_IN OMX_HANDLETYPE hOutput,
-    OMX_IN OMX_U32 nPortOutput,
-    OMX_IN OMX_HANDLETYPE hInput,
-    OMX_IN OMX_U32 nPortInput)
-{
-    return OMX_ErrorNotImplemented;
-}
-
-OMX_API OMX_ERRORTYPE   OMX_GetContentPipe(
-    OMX_OUT OMX_HANDLETYPE *hPipe,
-    OMX_IN OMX_STRING szURI)
-{
-    return OMX_ErrorNotImplemented;
 }
 
 OMX_API OMX_ERRORTYPE OMX_GetComponentsOfRole (
