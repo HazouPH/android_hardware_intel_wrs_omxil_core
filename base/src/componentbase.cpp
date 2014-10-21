@@ -651,6 +651,15 @@ OMX_ERRORTYPE ComponentBase::CBaseSetParameter(
                         kMaxAdaptiveStreamingWidth, kMaxAdaptiveStreamingHeight);
                 return OMX_ErrorBadParameter;
             }
+
+            if (GetWorkingRole() != NULL &&
+                        !strcmp (GetWorkingRole(),"video_decoder.vp9")) {
+                if (p->nMaxFrameWidth < 640 && p->nMaxFrameHeight < 480) {
+                    p->nMaxFrameHeight = kMaxAdaptiveStreamingHeight;
+                    p->nMaxFrameWidth = kMaxAdaptiveStreamingWidth;
+                }
+            }
+
             mEnableAdaptivePlayback = p->bEnable;
             if (mEnableAdaptivePlayback != OMX_TRUE)
                 return OMX_ErrorBadParameter;
