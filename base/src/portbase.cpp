@@ -264,13 +264,9 @@ OMX_ERRORTYPE PortBase::SetPortDefinition(
         OMX_S32 nFrameSize = getFrameBufSize(format->eColorFormat,format->nFrameWidth,format->nFrameHeight);
         if(nFrameSize!=-1)
             temp.nBufferSize = nFrameSize;
-        if (overwrite_readonly) {
-            format->nStride = pformat->nStride;
-            format->nSliceHeight = pformat->nSliceHeight;
-        } else {
-            format->nStride = pformat->nFrameWidth;
-            format->nSliceHeight = pformat->nFrameHeight;
-        }
+
+        format->nStride = pformat->nStride;
+        format->nSliceHeight = pformat->nSliceHeight;
 
         break;
     }
