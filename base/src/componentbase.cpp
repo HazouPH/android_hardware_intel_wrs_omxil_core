@@ -644,7 +644,7 @@ OMX_ERRORTYPE ComponentBase::CBaseSetParameter(
 
             if (p->nMaxFrameWidth > kMaxAdaptiveStreamingWidth
                     || p->nMaxFrameHeight > kMaxAdaptiveStreamingHeight) {
-                LOGE("resolution %d x %d exceed max driver support %d x %d\n",p->nMaxFrameWidth, p->nMaxFrameHeight,
+                LOGE("resolution %lu x %lu exceed max driver support %lu x %lu\n",p->nMaxFrameWidth, p->nMaxFrameHeight,
                         kMaxAdaptiveStreamingWidth, kMaxAdaptiveStreamingHeight);
                 return OMX_ErrorBadParameter;
             }
